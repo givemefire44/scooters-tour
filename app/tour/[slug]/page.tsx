@@ -3,6 +3,10 @@ import { urlFor } from '@/sanity/lib/image';
 import { Metadata } from 'next';
 import TourPageClient from './TourPageClient';
 
+// 🆕 CONFIGURACIÓN DEL SITIO
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://scooterstour.com';
+const SITE_NAME = process.env.NEXT_PUBLIC_SITE_NAME || 'ScootersTour';
+
 // ========================================
 // GENERAR METADATA DINÁMICO CON STRUCTURED DATA - Next.js 15
 // ========================================
@@ -48,25 +52,24 @@ export async function generateMetadata({
   }
 
   // Construir URLs
-  const baseUrl = 'https://colosseumroman.com';
-  const canonical = `${baseUrl}/tour/${post.slug.current}`;
+  const canonical = `${SITE_URL}/tour/${post.slug.current}`;
   
   // Imagen social
   const socialImage = post.seoImage 
     ? urlFor(post.seoImage).width(1200).height(630).url()
-    : `${baseUrl}/images/default-social.jpg`;
+    : `${SITE_URL}/images/default-social.jpg`;
 
   // Título y descripción finales
   const title = post.seoTitle || post.title;
-  const description = post.seoDescription || `Descubrí ${post.title} - Tour completo con guía experto`;
+  const description = post.seoDescription || `Discover ${post.title} - Complete tour with expert guide`;
 
   return {
     title,
     description,
     keywords: post.seoKeywords || [],
-    authors: [{ name: 'ColosseumRoman.com' }],
-    creator: 'ColosseumRoman.com',
-    publisher: 'ColosseumRoman.com',
+    authors: [{ name: SITE_NAME }],
+    creator: SITE_NAME,
+    publisher: SITE_NAME,
     
     // Open Graph
     openGraph: {
@@ -75,7 +78,7 @@ export async function generateMetadata({
       url: canonical,
       title,
       description,
-      siteName: 'ColosseumRoman.com',
+      siteName: SITE_NAME,
       images: [
         {
           url: socialImage,
@@ -249,7 +252,7 @@ export default async function TourPage({ params }: { params: Promise<{ slug: str
     "@type": "Product",
     "name": post.seoTitle || post.title,
     "description": post.seoDescription || `Discover ${post.title} with expert guides`,
-    "url": `https://colosseumroman.com/tour/${post.slug.current}`,
+    "url": `${SITE_URL}/tour/${post.slug.current}`,
     "category": "Tour",
     
     // Imagen principal
@@ -298,8 +301,8 @@ export default async function TourPage({ params }: { params: Promise<{ slug: str
         "availability": "https://schema.org/InStock",
         "price": post.tourInfo.price,
         "priceCurrency": post.tourInfo.currency,
-        "priceValidUntil": priceValidUntilString, // ✅ NUEVO: Fecha de validez del precio
-        "url": post.bookingUrl || post.getYourGuideUrl || `https://colosseumroman.com/tour/${post.slug.current}`,
+        "priceValidUntil": priceValidUntilString,
+        "url": post.bookingUrl || post.getYourGuideUrl || `${SITE_URL}/tour/${post.slug.current}`,
         "seller": {
           "@type": "Organization",
           "name": "GetYourGuide",
@@ -361,8 +364,8 @@ export default async function TourPage({ params }: { params: Promise<{ slug: str
     // Organización proveedora
     "provider": {
       "@type": "Organization",
-      "name": "Colosseum Roman",
-      "url": "https://colosseumroman.com"
+      "name": SITE_NAME,
+      "url": SITE_URL
     }
   } : null;
 

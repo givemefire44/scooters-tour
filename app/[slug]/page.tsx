@@ -319,19 +319,19 @@ export async function generateMetadata(
   const page = await getPage(slug)
   if (!page) {
     return {
-      title: 'Page Not Found | ColosseumRoman',
+      title: 'Page Not Found | ',
       description: 'This page doesn\'t exist.'
     }
   }
 
-  const baseUrl = 'https://colosseumroman.com'
+  const baseUrl = 'https://.com'
   const canonical = `${baseUrl}/${slug}`
   
   // SEO data con fallbacks
-  const title = page.seoTitle || page.seo?.metaTitle || `${page.title} | ColosseumRoman`
+  const title = page.seoTitle || page.seo?.metaTitle || `${page.title} | ScootersTour`
   const description = page.seoDescription || page.seo?.metaDescription || 
-    page.heroContent?.excerpt || `Learn more about ${page.title} at ColosseumRoman`
-  const keywords = page.seoKeywords || [page.title.toLowerCase(), 'colosseumroman', 'rome tours']
+    page.heroContent?.excerpt || `Learn more about ${page.title} at ScootersTour`
+  const keywords = page.seoKeywords || [page.title.toLowerCase(), 'ScootersTour', 'rome tours']
 
   // 🚀 IMAGEN SOCIAL OPTIMIZADA
   const socialImage = page.seoImage 
@@ -344,9 +344,9 @@ export async function generateMetadata(
     title,
     description,
     keywords,
-    authors: [{ name: 'ColosseumRoman' }],
-    creator: 'ColosseumRoman',
-    publisher: 'ColosseumRoman',
+    authors: [{ name: 'ScootersTour' }],
+    creator: 'ScootersTour',
+    publisher: 'ScootersTour',
     
     openGraph: {
       type: 'website',
@@ -354,7 +354,7 @@ export async function generateMetadata(
       url: canonical,
       title,
       description,
-      siteName: 'ColosseumRoman',
+      siteName: 'ScootersTour',
       images: [
         {
           url: socialImage,

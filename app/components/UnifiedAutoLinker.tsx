@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, Children, isValidElement } from 'react';
+import { useState, useEffect, Children, isValidElement, ReactNode } from 'react';
 import { addAutoLinks } from '../utils/autoLinker';
 
 // 🆕 FUNCIÓN PARA DETECTAR Y LINKEAR URLs Y EMAILS
@@ -30,7 +30,7 @@ interface UnifiedAutoLinkerProps {
   pageSlug?: string;
   className?: string;
   style?: React.CSSProperties;
-  disabled?: boolean; // 🆕 NUEVA PROP
+  disabled?: boolean;
 }
 
 // 🔍 DETECTAR SI YA HAY LINKS DE SANITY
@@ -53,6 +53,26 @@ function hasExistingLinks(children: any): boolean {
     if (element.props.children) {
       return hasExistingLinks(element.props.children);
     }
+  }
+  
+  return false;
+}
+
+// 🆕 DETECTAR SI HAY MARKS (negritas, cursivas, etc.)
+function hasMarks(children: any): boolean {
+  if (!children) return false;
+  
+  // Si es un elemento React con tags HTML como <strong>, <em>, etc.
+  if (isValidElement(children)) {
+    const type = (children as any).type;
+    if (type === 'strong' || type === 'em' || type === 'code' || type === 'span') {
+      return true;
+    }
+  }
+  
+  // Si es array, revisar cada elemento
+  if (Array.isArray(children)) {
+    return children.some(child => hasMarks(child));
   }
   
   return false;
@@ -83,13 +103,13 @@ function extractTextFromChildren(children: any): string {
   return '';
 }
 
-// 🚀 COMPONENTE UNIFICADO CON DETECCIÓN DE LINKS Y URLs
+// 🚀 COMPONENTE UNIFICADO CON DETECCIÓN DE LINKS, URLs Y MARKS
 export default function UnifiedAutoLinker({ 
   children, 
   pageSlug, 
   className = 'content-paragraph',
   style = {},
-  disabled = false // 🆕 DEFAULT FALSE
+  disabled = false
 }: UnifiedAutoLinkerProps) {
   
   // 🎯 SI DISABLED, RENDERIZAR SIN PROCESAR
@@ -102,8 +122,11 @@ export default function UnifiedAutoLinker({
   }
   
   const hasLinks = hasExistingLinks(children);
+  const hasFormattingMarks = hasMarks(children);
   
-  if (hasLinks) {
+  // 🔥 SI HAY MARKS (negritas, cursivas, etc.), NO PROCESAR
+  // Renderizar directo para preservar formato
+  if (hasLinks || hasFormattingMarks) {
     return (
       <p className={className} style={style}>
         {children}

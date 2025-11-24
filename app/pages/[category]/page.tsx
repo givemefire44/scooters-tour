@@ -88,7 +88,7 @@ export async function generateMetadata({
   }
 
   return {
-    title: categoryData.seoTitle || `${categoryData.title} - Colosseum Roman`,
+    title: categoryData.seoTitle || `${categoryData.title} - Scooters Tour`,
     description: categoryData.seoDescription || categoryData.description,
     openGraph: {
       title: categoryData.seoTitle || categoryData.title,

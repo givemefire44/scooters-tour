@@ -14,6 +14,8 @@ import MobileTourPage from '../../components/MobileTourPage';
 import Breadcrumbs from '../../components/Breadcrumbs';
 import RatingDisplay from '../../components/RatingDisplay';
 
+
+
 // Hook para detectar mobile
 function useMediaQuery(query: string) {
   const [matches, setMatches] = useState(false);
@@ -109,8 +111,8 @@ export default function TourPageClient({
           }}>
             
             <section id="description">
-              <SanityContent post={post} />
-            </section>
+  <SanityContent post={post} />
+</section>
 
             <section id="details" style={{ marginTop: '40px', marginBottom: '40px' }}>
               <div className="desktop-tour-details-panel">

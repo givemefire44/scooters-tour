@@ -9,6 +9,6 @@ export default function robots(): MetadataRoute.Robots {
         disallow: ['/admin/', '/studio/'],
       },
     ],
-    sitemap: 'https://colosseumroman.com/sitemap.xml',
+    sitemap: 'https://scooterstour.com/sitemap.xml',
   }
 }

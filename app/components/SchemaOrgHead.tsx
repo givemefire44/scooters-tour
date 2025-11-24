@@ -13,7 +13,7 @@ interface SchemaOrgHeadProps {
   baseUrl?: string;
 }
 
-export default function SchemaOrgHead({ pageData, baseUrl = 'https://colosseumroman.com' }: SchemaOrgHeadProps) {
+export default function SchemaOrgHead({ pageData, baseUrl = 'https://scooterstour.com' }: SchemaOrgHeadProps) {
   const pageSchema = generatePageSchema(pageData, baseUrl);
 
   if (!pageSchema) {

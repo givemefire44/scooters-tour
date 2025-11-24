@@ -4,6 +4,7 @@ import { Metadata } from 'next'
 import { Suspense } from 'react'
 import Container from "./components/Container";
 import HeroHostel from "./components/HeroHostel";
+
 import TestimonialCarousel from "./components/TestimonialCarousel";
 import HostelGrid from "./components/HostelMosaic";
 import Footer from "./components/Footer";
@@ -145,30 +146,31 @@ const getDestinations = async () => {
   })
 }
 
+
 // ========================================
 // 🔍 METADATA ULTRA-SEO OPTIMIZADO
 // ========================================
 export async function generateMetadata(): Promise<Metadata> {
   const homepage = await getHomepage()
   
-  const title = homepage?.seo?.title || 'Rome Tours & Experiences | ColosseumRoman'
-  const description = homepage?.seo?.description || 'Discover authentic Rome with skip-the-line tours, expert guides, and unforgettable experiences. Book your perfect Roman adventure today.'
-  const keywords = homepage?.seo?.keywords || ['Rome tours', 'Colosseum tours', 'Vatican tours', 'skip the line', 'Rome experiences']
+ const title = homepage?.seo?.title || 'Vespa & Scooter Tours | Book Now, Free Cancellation'
+const description = homepage?.seo?.description || 'Book guided Vespa and scooter tours in Rome, Paris, Miami & more. Expert local guides, premium bikes, skip-the-line access. Free cancellation. Reserve now!'
+const keywords = homepage?.seo?.keywords || ['vespa tours', 'scooter tours', 'guided vespa tour', 'scooter rental', 'city tours', 'vespa adventures', 'moped tours', 'scooter experiences']
   
   // Imagen social optimizada
   const socialImage = homepage?.seo?.socialImage 
     ? urlFor(homepage.seo.socialImage).width(1200).height(630).format('webp').quality(90).url()
-    : 'https://colosseumroman.com/images/default-social.webp'
+    : 'https://scooterstour.com/images/default-social.webp'
 
-  const baseUrl = 'https://colosseumroman.com'
+  const baseUrl = 'https://scooterstour.com'
 
   return {
     title,
     description,
     keywords,
-    authors: [{ name: 'ColosseumRoman' }],
-    creator: 'ColosseumRoman',
-    publisher: 'ColosseumRoman',
+    authors: [{ name: 'ScootersTour' }],
+    creator: 'ScootersTour',
+    publisher: 'ScootersTour',
     
     // Open Graph PRO
     openGraph: {
@@ -177,7 +179,7 @@ export async function generateMetadata(): Promise<Metadata> {
       url: baseUrl,
       title,
       description,
-      siteName: 'ColosseumRoman',
+      siteName: 'ScootersTour',
       images: [
         {
           url: socialImage,
@@ -192,8 +194,8 @@ export async function generateMetadata(): Promise<Metadata> {
     // Twitter optimizado
     twitter: {
       card: 'summary_large_image',
-      site: '@ColosseumRoman',
-      creator: '@ColosseumRoman',
+      site: '@ScootersTour',
+      creator: '@ScootersTour',
       title,
       description,
       images: [socialImage],
@@ -244,22 +246,22 @@ export default async function HomePage() {
   const organizationSchema = {
     "@context": "https://schema.org",
     "@type": "Organization",
-    "name": "Colosseum Roman",
-    "alternateName": "ColosseumRoman.com",
-    "url": "https://colosseumroman.com",
+    "name": "Scooters Tour",
+    "alternateName": "ScootersTour.com",
+    "url": "https://scooterstour.com",
     "logo": {
       "@type": "ImageObject",
-      "url": "https://colosseumroman.com/logo.png",
+      "url": "https://scooterstour.com/logo.png",
       "width": 250,
       "height": 60
     },
-    "description": "Expert curators of the best Colosseum tours and comprehensive Rome travel guides since 2006.",
-    "foundingDate": "2006",
+    "description": "Expert curators of the best scooter and Vespa tours with comprehensive city guides worldwide since 2024.",
+    "foundingDate": "2024",
     
     "founder": {
       "@type": "Person",
       "name": "Mario Dalo",
-      "jobTitle": "Founder & Rome Travel Curator",
+      "jobTitle": "Founder & Travel Specialist",
       "url": "https://linkedin.com/in/mario-dalo"
     },
     
@@ -274,46 +276,48 @@ export default async function HomePage() {
     
     "contactPoint": {
       "@type": "ContactPoint",
-      "email": "hello@colosseumroman.com",
+      "email": "hello@scooterstour.com",
       "contactType": "Customer Service",
       "availableLanguage": ["English", "Spanish"]
     },
     
     "sameAs": [
       "https://linkedin.com/in/mario-dalo",
-      "https://instagram.com/colosseumroman",
+      "https://instagram.com/scooterstour",
       "https://featured.com/p/mario-dalo"
     ],
     
-    "knowsAbout": [
-      "Roman Colosseum",
-      "Rome Tourism",
-      "Historical Tours",
-      "Travel Planning",
-      "Ancient Rome History"
-    ]
+   "knowsAbout": [
+  "Scooter Tours",
+  "Vespa Tours",
+  "Guided City Adventures",
+  "Urban Exploration",
+  "Travel Planning",
+  "Local Experiences",
+  "Moped Tourism"
+]
   };
 
   const websiteSchema = {
     "@context": "https://schema.org",
     "@type": "WebSite",
-    "name": "Colosseum Roman",
-    "alternateName": "ColosseumRoman.com",
-    "url": "https://colosseumroman.com",
-    "description": "Your expert guide to Colosseum tours and Rome travel planning",
+    "name": "Scooters Tour",
+    "alternateName": "ScootersTour.com",
+    "url": "https://scooterstour.com",
+    "description": "Your expert guide to scooter tours and urban adventures worldwide",
     "publisher": {
       "@type": "Organization",
-      "name": "Colosseum Roman",
+      "name": "Scooters Tour",
       "logo": {
         "@type": "ImageObject",
-        "url": "https://colosseumroman.com/logo.png"
+        "url": "https://scooterstour.com/logo.png"
       }
     },
     "potentialAction": {
       "@type": "SearchAction",
       "target": {
         "@type": "EntryPoint",
-        "urlTemplate": "https://colosseumroman.com/search?q={search_term_string}"
+        "urlTemplate": "https://scooterstour.com/search?q={search_term_string}"
       },
       "query-input": "required name=search_term_string"
     }
@@ -323,13 +327,13 @@ export default async function HomePage() {
   const featuredToursSchema = {
     "@context": "https://schema.org",
     "@type": "ItemList",
-    "name": "Featured Colosseum Tours",
-    "description": "Top-rated Colosseum tours handpicked by our experts",
+    "name": "Featured Scooters Tours",
+    "description": "Top-rated Scooters tours handpicked by our experts",
     "numberOfItems": Math.min(tours.length, 10),
     "itemListElement": tours.slice(0, 10).map((tour: any, index: number) => ({
       "@type": "ListItem",
       "position": index + 1,
-      "url": `https://colosseumroman.com/tour/${tour.slug.current}`,
+      "url": `https://scooterstour.com/tour/${tour.slug.current}`,
       "name": tour.title
     }))
   };
@@ -356,28 +360,30 @@ export default async function HomePage() {
         }}
       />
 
-      {/* Hero - Crítico, renderizado inmediato */}
-      <Container>
+    {/* Hero - Crítico, renderizado inmediato */}
+ 
         <HeroHostel />
-      </Container>
+
+           {/* Below the fold - Con Suspense para loading progresivo */}
+      {/* <Suspense fallback={<div className="h-32 bg-gray-100 animate-pulse rounded-lg" />}> */}
+      <Container>
+          <TestimonialCarousel />
+        </Container>
+      {/* </Suspense> */}
+      
       
       {/* Above the fold - Datos pre-cargados */}
       <Container>
         <HostelGrid />
       </Container>
       
-      {/* Below the fold - Con Suspense para loading progresivo */}
-      <Suspense fallback={<div className="h-32 bg-gray-100 animate-pulse rounded-lg" />}>
-        <Container>
-          <TestimonialCarousel />
-        </Container>
-      </Suspense>
+   
       
-      <Suspense fallback={<div className="h-24 bg-gray-100 animate-pulse rounded-lg" />}>
+      {/* <Suspense fallback={<div className="h-24 bg-gray-100 animate-pulse rounded-lg" />}> */}
         <Container>
           <ImpactBanner />
         </Container>
-      </Suspense>
+      {/* </Suspense> */}
       
       <Container>
         <LugaresPopularesArg />

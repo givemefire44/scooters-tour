@@ -71,7 +71,14 @@ export default function LugaresPopularesArg() {
             className={`lugar-card-masonry lugar-card-masonry-${i + 1}`}
             aria-label={`Ver más de ${lugar.nombre}`}
           >
-            <div className="lugar-image-container">
+            <div 
+              className="lugar-image-container"
+              style={{ 
+                position: 'relative',
+                width: '100%',
+                height: '100%'
+              }}
+            >
               <Image
                 src={lugar.img}
                 alt={lugar.nombre}

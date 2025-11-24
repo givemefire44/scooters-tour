@@ -1,0 +1,214 @@
+ESTRUCTURA DEL PROYECTO - SCOOTERS TOUR
+========================================
+
+scooters-tour/
+│
+├── app/                                    # Directorio principal de Next.js App Router
+│   ├── [slug]/                             # Páginas estáticas dinámicas
+│   │   ├── page.tsx                        # Página dinámica por slug
+│   │   └── StaticPageClient.tsx            # Cliente para páginas estáticas
+│   │
+│   ├── api/                                # API Routes
+│   │   ├── fetch-image/
+│   │   │   └── route.ts
+│   │   ├── fetch-link/
+│   │   │   └── route.ts
+│   │   ├── tinymce-config/
+│   │   └── viator/
+│   │       └── route.ts
+│   │
+│   ├── blog/                               # Sección del blog
+│   │   ├── [slug]/
+│   │   └── components/
+│   │
+│   ├── components/                         # Componentes de la aplicación
+│   │   ├── blog/                           # Componentes específicos del blog
+│   │   │   ├── BlogCard.tsx
+│   │   │   ├── BlogCard.css
+│   │   │   ├── BlogSection.tsx
+│   │   │   ├── CategoryBlogSection.tsx
+│   │   │   ├── HeroGallery.tsx
+│   │   │   ├── HeroGallery.module.css
+│   │   │   ├── RelatedPosts.tsx
+│   │   │   └── SanityContent.tsx
+│   │   │
+│   │   ├── Breadcrumbs.tsx                 # Migas de pan
+│   │   ├── BubbleComments.tsx              # Sistema de comentarios
+│   │   ├── CategoryEditorialContent.tsx     # Contenido editorial de categorías
+│   │   ├── CategoryFAQ.tsx                 # FAQs por categoría
+│   │   ├── CitySearch.tsx                  # Buscador de ciudades
+│   │   ├── Container.jsx                   # Contenedor general
+│   │   ├── CookieBanner.tsx                # Banner de cookies
+│   │   ├── DeferredGA.tsx                  # Google Analytics diferido
+│   │   ├── FloatingCTA.tsx                 # Call-to-action flotante
+│   │   ├── Footer.tsx                      # Pie de página
+│   │   ├── Header.css                      # Estilos del header
+│   │   ├── HeroHostel.tsx                  # Hero principal
+│   │   ├── HeroHostel.css                  # Estilos del hero
+│   │   ├── HostelMosaic.tsx                # Mosaico de destinos
+│   │   ├── ImpactBanner.tsx                # Banner de impacto
+│   │   ├── LugaresPopularesArg.tsx         # Lugares populares Argentina
+│   │   ├── MinimalHeader.tsx               # Header minimalista
+│   │   ├── MobileTourPage.tsx              # Página móvil de tours
+│   │   ├── RatingDisplay.tsx               # Visualizador de ratings
+│   │   ├── SchemaOrgHead.tsx               # Schema.org para SEO
+│   │   ├── ScrollToTop.tsx                 # Botón scroll to top
+│   │   ├── SEOHead.tsx                     # SEO head component
+│   │   ├── TableOfContents.tsx             # Tabla de contenidos
+│   │   ├── TestimonialCarousel.jsx         # Carrusel de testimonios
+│   │   ├── TourHeader.tsx                  # Header de tours
+│   │   └── UnifiedAutoLinker.tsx           # Sistema de links automáticos
+│   │
+│   ├── data/                               # Datos estáticos
+│   │   ├── categoryFAQs.ts                 # FAQs por categoría
+│   │   └── cities.json                     # Lista de ciudades
+│   │
+│   ├── hooks/                              # Custom React Hooks
+│   │   ├── index.ts
+│   │   └── usePerformance.ts               # Hook de performance
+│   │
+│   ├── pages/                              # Páginas adicionales
+│   │   └── [category]/
+│   │       └── page.tsx
+│   │
+│   ├── studio/                             # Sanity Studio
+│   │   └── [[...tool]]/
+│   │       └── page.tsx
+│   │
+│   ├── tour/                               # Páginas individuales de tours
+│   │   └── [slug]/
+│   │       ├── page.tsx
+│   │       └── TourPageClient.tsx
+│   │
+│   ├── tours/                              # Listados de tours por categoría
+│   │   └── [category]/
+│   │       └── page.tsx
+│   │
+│   ├── utils/                              # Utilidades
+│   │   ├── autoLinker.ts                   # Sistema de enlaces automáticos
+│   │   ├── index.ts
+│   │   ├── performance.ts                  # Utilidades de performance
+│   │   ├── proTips.ts                      # Tips profesionales
+│   │   └── schemaGenerator.ts              # Generador de schemas
+│   │
+│   ├── globals.css                         # Estilos globales
+│   ├── icon.png                            # Icono de la app
+│   ├── layout.tsx                          # Layout principal
+│   ├── not-found.tsx                       # Página 404
+│   ├── page.tsx                            # Página principal
+│   ├── robots.ts                           # robots.txt dinámico
+│   └── sitemap.ts                          # Sitemap dinámico
+│
+├── components/                             # Componentes adicionales (legacy)
+│
+├── lib/                                    # Librerías y configuraciones
+│   ├── icons.tsx                           # Iconos del proyecto
+│   └── supabaseClient.bak                  # Cliente Supabase (backup)
+│
+├── public/                                 # Archivos públicos estáticos
+│   ├── images/                             # Imágenes
+│   │   ├── payment-methods.png
+│   │   ├── rider-1.jpg
+│   │   ├── rider-2.jpg
+│   │   ├── rider-3.jpg
+│   │   ├── rider-4.jpg
+│   │   ├── vespa-colosseum.jpg
+│   │   ├── vespa-verona.jpg
+│   │   └── tours/                          # Imágenes de tours
+│   │       ├── gondola-tour.jpeg
+│   │       ├── palacio-real-madrid.jpg
+│   │       ├── plaza-espana.jpg
+│   │       ├── reina-sofia-madrid.jpg
+│   │       ├── sagrada-familia.jpg
+│   │       ├── sagradafamilia.jpeg
+│   │       ├── sanmarcos.jpeg
+│   │       ├── sevilla-cathedral.jpg
+│   │       ├── vaticanotours.jpeg
+│   │       ├── vespa-tour.jpeg
+│   │       └── vespatours.jpg
+│   │
+│   ├── file.svg
+│   ├── globe.svg
+│   ├── next.svg
+│   ├── payment-metod.png
+│   ├── vercel.svg
+│   └── window.svg
+│
+├── sanity/                                 # Configuración de Sanity CMS
+│   ├── lib/                                # Librerías de Sanity
+│   │   ├── client.ts                       # Cliente de Sanity
+│   │   ├── image.ts                        # Helpers de imágenes
+│   │   └── live.ts                         # Live preview
+│   │
+│   ├── schemaTypes/                        # Schemas de Sanity
+│   │   ├── authorType.ts                   # Schema de autores
+│   │   ├── blockContentType.ts             # Schema de contenido de bloques
+│   │   ├── categoryType.ts                 # Schema de categorías
+│   │   ├── destinationCard.ts              # Schema de tarjetas de destino
+│   │   ├── homepage.ts                     # Schema de homepage
+│   │   ├── index.ts                        # Index de schemas
+│   │   ├── mosaicCard.ts                   # Schema de tarjetas mosaico
+│   │   ├── page.ts                         # Schema de páginas
+│   │   ├── pageCategoryType.ts             # Schema de categorías de página
+│   │   └── postType.ts                     # Schema de posts
+│   │
+│   ├── env.ts                              # Variables de entorno
+│   └── structure.ts                        # Estructura del Studio
+│
+├── tour-importer/                          # Herramienta de importación de tours
+│   ├── src/                                # Código fuente
+│   │   ├── category-content-generator.js   # Generador de contenido de categorías
+│   │   ├── contentGenerator.js             # Generador de contenido
+│   │   ├── debug-env.js                    # Debug de variables de entorno
+│   │   ├── generate-category.js            # Generador de categorías
+│   │   ├── imageProcessor.js               # Procesador de imágenes
+│   │   ├── index.js                        # Entry point
+│   │   ├── sanityUploader.js               # Uploader a Sanity
+│   │   └── scraper.js                      # Web scraper
+│   │
+│   ├── templates/                          # Templates
+│   │   └── post-template.js
+│   │
+│   ├── temp/                               # Archivos temporales
+│   ├── config.js                           # Configuración
+│   ├── package.json
+│   ├── package-lock.json
+│   └── README.md
+│
+├── tours/                                  # (vacío, posible uso futuro)
+│
+├── .env.local                              # Variables de entorno locales
+├── .eslintrc.json                          # Configuración ESLint
+├── .gitignore                              # Git ignore
+├── .npmrc                                  # Configuración NPM
+├── EDITOR_FEATURES.md                      # Documentación de features
+├── ESTRUCTURA-PROYECTO.md                  # Este archivo en Markdown
+├── next-env.d.ts                           # Types de Next.js
+├── next.config.js                          # Configuración de Next.js
+├── package.json                            # Dependencias del proyecto
+├── package-lock.json                       # Lock de dependencias
+├── payment-methods.png
+├── PROJECT_STRUCTURE.md                    # Documentación de estructura
+├── README.md                               # README principal
+├── sanity.cli.ts                           # CLI de Sanity
+├── sanity.config.ts                        # Configuración de Sanity
+└── tsconfig.json                           # Configuración de TypeScript
+
+
+DIRECTORIOS EXCLUIDOS (generados automáticamente):
+---------------------------------------------------
+- node_modules/                             # Dependencias de Node
+- .next/                                    # Build de Next.js
+- dist/                                     # Distribución
+- .sanity/                                  # Cache de Sanity
+
+
+TECNOLOGÍAS PRINCIPALES:
+------------------------
+- Next.js 14+ (App Router)
+- React 18+
+- TypeScript
+- Sanity CMS
+- TailwindCSS
+- Google Analytics
+

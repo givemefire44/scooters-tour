@@ -9,6 +9,7 @@ import Container from '@/app/components/Container'
 import UnifiedAutoLinker from '@/app/components/UnifiedAutoLinker'
 import Breadcrumbs from '@/app/components/Breadcrumbs'
 import SchemaOrgHead from '@/app/components/SchemaOrgHead'
+import TableOfContents from '@/app/components/TableOfContents'
 
 // Interface actualizada con richSnippets y sidebarWidget
 interface SanityPage {
@@ -128,8 +129,8 @@ export default function StaticPageClient({
   slug: string;
   recommendedTours: any[];
 }) {
-  
-  // 🎯 PÁGINAS DONDE NO USAR AUTOLINKER
+
+ // 🎯 PÁGINAS DONDE NO USAR AUTOLINKER
   const excludedSlugs = ['about-us', 'contact-us', 'privacy-policy'];
   const isExcludedPage = excludedSlugs.includes(page.slug.current);
   
@@ -483,29 +484,67 @@ export default function StaticPageClient({
       )
     },
     block: {
-      h2: ({ children }: any) => (
-        <h2 style={{ 
-          fontSize: '2rem', 
-          fontWeight: 'bold', 
-          marginTop: '2.5rem', 
-          marginBottom: '1rem',
-          color: '#1a1a1a',
-          lineHeight: '1.2'
-        }}>
-          {children}
-        </h2>
-      ),
-      h3: ({ children }: any) => (
-        <h3 style={{ 
-          fontSize: '1.5rem', 
-          fontWeight: '600', 
-          marginTop: '2rem', 
-          marginBottom: '0.8rem',
-          color: '#2a2a2a'
-        }}>
-          {children}
-        </h3>
-      ),
+      h2: ({ children, value }: any) => {
+        // 🆕 Concatenar TODOS los children (igual que el TOC)
+        const text = value?.children
+          ?.map((child: any) => child.text || '')
+          .join('')
+          .trim() || '';
+        
+        const id = text
+          .replace(/[^\w\s-]/g, '')
+          .toLowerCase()
+          .trim()
+          .replace(/\s+/g, '-')
+          .replace(/(^-|-$)/g, '');
+        
+        return (
+          <h2 
+            id={id}
+            style={{ 
+              fontSize: '2rem', 
+              fontWeight: 'bold', 
+              marginTop: '2.5rem', 
+              marginBottom: '1rem',
+              color: '#1a1a1a',
+              lineHeight: '1.2',
+              scrollMarginTop: '100px'
+            }}
+          >
+            {children}
+          </h2>
+        );
+      },
+      h3: ({ children, value }: any) => {
+        // 🆕 Concatenar TODOS los children (igual que el TOC)
+        const text = value?.children
+          ?.map((child: any) => child.text || '')
+          .join('')
+          .trim() || '';
+        
+        const id = text
+          .replace(/[^\w\s-]/g, '')
+          .toLowerCase()
+          .trim()
+          .replace(/\s+/g, '-')
+          .replace(/(^-|-$)/g, '');
+        
+        return (
+          <h3 
+            id={id}
+            style={{ 
+              fontSize: '1.5rem', 
+              fontWeight: '600', 
+              marginTop: '2rem', 
+              marginBottom: '0.8rem',
+              color: '#2a2a2a',
+              scrollMarginTop: '100px'
+            }}
+          >
+            {children}
+          </h3>
+        );
+      },
       h4: ({ children }: any) => (
         <h4 style={{ 
           fontSize: '1.25rem', 
@@ -551,7 +590,9 @@ export default function StaticPageClient({
 
   return (
     <div>
-      {/* SOLO SchemaOrgHead - Sistema unificado */}
+   
+ 
+ {/* SOLO SchemaOrgHead - Sistema unificado */}
       <SchemaOrgHead pageData={pageDataForSchema} />
 
       {/* TÍTULO ARRIBA - EXACTO COMO TOUR PAGE */}
@@ -676,7 +717,7 @@ export default function StaticPageClient({
 
       {/* LAYOUT DOS COLUMNAS - CON CLASES PARA RESPONSIVE */}
       <Container>
-        <div className="main-grid" style={{
+   <div className="main-grid" style={{
           display: 'grid',
           gridTemplateColumns: '2fr 300px',
           gap: '40px',
@@ -754,6 +795,8 @@ export default function StaticPageClient({
                 </div>
               </section>
             )}
+              {/* 🆕 TABLE OF CONTENTS - Justo antes del contenido */}
+  <TableOfContents content={page.content} />
 
             {/* CONTENIDO PRINCIPAL CON AUTO-LINKS Y GALERÍAS */}
             <section id="description" className="sanity-content" style={{ marginBottom: '3rem' }}>

@@ -93,7 +93,7 @@ export default function RecommendedTours({
       <section className="recommended-tours-section">
         <div className="recommended-tours-container">
           <h2 className="recommended-tours-title">
-            Our most recommended Colosseum Tours
+            Recommended
           </h2>
 
           {/* 🎯 TOURS GRID */}

@@ -2,9 +2,6 @@
 import { PortableText } from '@portabletext/react';
 import { urlFor } from '@/sanity/lib/image';
 import Image from 'next/image';
-import { useEffect } from 'react';
-import UnifiedAutoLinker, { autoLinkerStyles } from '@/app/components/UnifiedAutoLinker';
-import { resetPageCounters } from '@/app/utils/autoLinker';
 
 // Función para generar IDs automáticamente
 function generateSectionId(children: any): string {
@@ -50,22 +47,6 @@ export default function SanityContent({ post }: SanityContentProps) {
   console.log('🔍 DEBUG - Content:', post.content);
   console.log('🔍 DEBUG - Body:', post.body);
   
-  // 🧠 EXTRAER SLUG DEL TOUR PARA CONTEXTO INTELIGENTE
-  const tourSlug = post.slug?.current;
-
-  // 🎯 PÁGINAS DONDE NO USAR AUTOLINKER
-  const excludedSlugs = ['about-us', 'contact-us', 'privacy-policy'];
-  const isExcludedPage = tourSlug ? excludedSlugs.includes(tourSlug) : false;
-
-  // 🧹 LIMPIAR CONTADORES CUANDO CAMBIA DE PÁGINA
-  useEffect(() => {
-    return () => {
-      if (tourSlug) {
-        resetPageCounters(tourSlug);
-      }
-    };
-  }, [tourSlug]);
-
   // 🆕 USAR EL CONTENIDO CORRECTO (body para blogs, content para páginas)
   const contentToRender = post.content || post.body;
   
@@ -85,7 +66,7 @@ export default function SanityContent({ post }: SanityContentProps) {
     console.log('🚨 ERROR: contentToRender no es un array o está vacío');
   }
 
-  // Componentes custom para PortableText con auto-sync
+  // Componentes custom para PortableText
   const components = {
     types: {
       // 🖼️ IMAGEN SIMPLE
@@ -314,17 +295,12 @@ export default function SanityContent({ post }: SanityContentProps) {
         );
       },
       
-      // 🔄 PÁRRAFOS CON UNIFIED AUTO LINKER
+      // ✅ PÁRRAFOS LIMPIOS SIN AUTOLINKER
       normal: ({ children }: any) => (
-        <UnifiedAutoLinker 
-          pageSlug={tourSlug}
-          disabled={isExcludedPage}
-        >
-          {children}
-        </UnifiedAutoLinker>
+        <p className="content-paragraph">{children}</p>
       ),
     },
-    // ✅ NUEVA SECCIÓN: MARKS (negritas, cursivas, etc.)
+    // ✅ MARKS (negritas, cursivas, etc.) - AHORA FUNCIONARÁN
     marks: {
       strong: ({ children }: any) => <strong>{children}</strong>,
       em: ({ children }: any) => <em>{children}</em>,
@@ -392,16 +368,13 @@ export default function SanityContent({ post }: SanityContentProps) {
           </div>
         )}
 
-        {/* 🔄 CONTENIDO CON AUTO-SYNC SANITY ASYNC */}
+        {/* CONTENIDO LIMPIO */}
         {contentToRender && (
           <PortableText value={contentToRender} components={components} />
         )}
         
-        {/* 🎨 CSS OPTIMIZADO Y LIMPIO */}
+        {/* CSS OPTIMIZADO Y LIMPIO */}
         <style jsx>{`
-          /* 🎯 ESTILOS PARA AUTO-LINKS */
-          ${autoLinkerStyles}
-          
           /* 🏗️ CONTENEDORES PRINCIPALES */
           .sanity-container {
             max-width: 100%;

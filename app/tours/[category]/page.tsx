@@ -8,7 +8,11 @@ import Footer from '@/app/components/Footer';
 import Breadcrumbs from '@/app/components/Breadcrumbs';
 // 🆕 IMPORTS NUEVOS
 import CategoryFAQ from '@/app/components/CategoryFAQ';
-import { getCategoryFAQs } from '@/app/data/categoryFAQs';
+import CategoryEditorialContent from '@/app/components/CategoryEditorialContent';
+
+// 🆕 CONFIGURACIÓN DEL SITIO
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://scooterstour.com';
+const SITE_NAME = process.env.NEXT_PUBLIC_SITE_NAME || 'ScootersTour';
 
 // ✅ CONFIGURACIÓN DE CACHE CONSISTENTE
 const cacheConfig = {
@@ -43,10 +47,14 @@ async function getCategory(slug: string) {
       heroSubtitle,
       highlights[]
     },
+    faqs[]{
+      question,
+      answer
+    },
     metaTitle,
     metaDescription
   }`;
-  
+
   const result = await client.fetch(query, { slug }, cacheConfig);
   console.log('CATEGORY DEBUG:', result);
   return result;
@@ -86,7 +94,7 @@ async function getPostsByCategory(categorySlug: string) {
     },
     "categoryTitle": category->title
   }`;
-  
+
   const result = await client.fetch(query, { categorySlug }, cacheConfig);
   console.log('POSTS DEBUG:', result);
   console.log('POSTS COUNT:', result.length);
@@ -112,7 +120,7 @@ async function getRecommendedTours() {
     },
     body
   }`;
-  
+
   return await client.fetch(query, {}, {
     next: { revalidate: 1800 }
   });
@@ -135,39 +143,38 @@ interface PageProps {
 export async function generateMetadata({ params }: PageProps) {
   const { category: categorySlug } = await params;
   const category = await getCategory(categorySlug);
-  
+
   if (!category) {
     return {};
   }
 
-  const baseUrl = 'https://colosseumroman.com';
-  const canonical = `${baseUrl}/tours/${category.slug.current}`;
-  
-  const title = category.seoTitle || category.metaTitle || `${category.title} Tours | ColosseumRoman`;
-  const description = category.seoDescription || category.metaDescription || category.description || `Discover amazing ${category.title} tours and experiences`;
-  const keywords = category.seoKeywords || [category.title.toLowerCase(), 'tours', 'experiences', 'rome'];
+  const canonical = `${SITE_URL}/tours/${category.slug.current}`;
 
-  const socialImage = category.seoImage?.asset?.url 
+  const title = category.seoTitle || category.metaTitle || `${category.title} Tours | ${SITE_NAME}`;
+  const description = category.seoDescription || category.metaDescription || category.description || `Discover amazing ${category.title} tours and experiences`;
+  const keywords = category.seoKeywords || [category.title.toLowerCase(), 'tours', 'experiences', 'scooter'];
+
+  const socialImage = category.seoImage?.asset?.url
     ? urlFor(category.seoImage).width(1200).height(630).format('webp').quality(85).url()
-    : category.image?.asset?.url 
-    ? urlFor(category.image).width(1200).height(630).format('webp').quality(85).url()
-    : `${baseUrl}/images/default-category.jpg`;
-  
+    : category.image?.asset?.url
+      ? urlFor(category.image).width(1200).height(630).format('webp').quality(85).url()
+      : `${SITE_URL}/images/default-category.jpg`;
+
   return {
     title,
     description,
     keywords,
-    authors: [{ name: 'ColosseumRoman' }],
-    creator: 'ColosseumRoman',
-    publisher: 'ColosseumRoman',
-    
+    authors: [{ name: SITE_NAME }],
+    creator: SITE_NAME,
+    publisher: SITE_NAME,
+
     openGraph: {
       type: 'website',
       locale: 'en_US',
       url: canonical,
       title,
       description,
-      siteName: 'ColosseumRoman',
+      siteName: SITE_NAME,
       images: [
         {
           url: socialImage,
@@ -177,21 +184,21 @@ export async function generateMetadata({ params }: PageProps) {
         },
       ],
     },
-    
+
     twitter: {
       card: 'summary_large_image',
       title,
       description,
       images: [socialImage],
     },
-    
+
     alternates: {
       canonical,
       languages: {
         'en': canonical,
       },
     },
-    
+
     robots: {
       index: true,
       follow: true,
@@ -200,7 +207,7 @@ export async function generateMetadata({ params }: PageProps) {
         follow: true,
       },
     },
-    
+
     verification: {
       google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION
     }
@@ -210,16 +217,16 @@ export async function generateMetadata({ params }: PageProps) {
 export default async function ToursCategory({ params }: PageProps) {
   const { category: categorySlug } = await params;
   const category = await getCategory(categorySlug);
-  
+
   if (!category) {
     notFound();
   }
-  
+
   const posts = await getPostsByCategory(categorySlug);
   const recommendedTours = await getRecommendedTours();
 
-  // 🆕 OBTENER FAQ
-  const categoryFAQs = getCategoryFAQs(category.title);
+  // ✅ OBTENER FAQs DESDE SANITY
+  const categoryFAQs = category.faqs || [];
 
   // ✅ NUEVO: Calcular fecha de validez del precio (1 año adelante)
   const priceValidUntil = new Date();
@@ -233,150 +240,147 @@ export default async function ToursCategory({ params }: PageProps) {
     : 0;
   const totalReviews = toursWithRating.reduce((sum, p) => sum + (p.getYourGuideData.reviewCount || 0), 0);
 
-// 🆕 SCHEMA COMPLETO CON ITEMLIST DETALLADO Y FAQ
-const categorySchema = {
-  "@context": "https://schema.org",
-  "@type": "CollectionPage",
-  "name": category.seoTitle || `${category.title} Tours`,
-  "description": category.seoDescription || category.description,
-  "url": `https://colosseumroman.com/tours/${category.slug.current}`,
-  "image": category.seoImage?.asset?.url || category.image?.asset?.url,
-  
-  // 🆕 ORGANIZATION
-  "publisher": {
-    "@type": "Organization",
-    "name": "Colosseum Roman",
-    "url": "https://colosseumroman.com",
-    "logo": {
-      "@type": "ImageObject",
-      "url": "https://colosseumroman.com/logo.png"
-    }
-  },
-  
-  "about": {
-    "@type": "TouristDestination",
-    "name": category.title,
-    "description": category.longDescription || category.description,
-    "url": `https://colosseumroman.com/tours/${category.slug.current}`
-  },
-  
-  // ✅ LISTA DE TOURS - CORREGIDO: Sin aggregateRating aquí
-  "hasPart": {
-    "@type": "ItemList",
-    "name": `${category.title} Tours Collection`,
-    "description": `Curated tours and experiences in ${category.title}`,
-    "numberOfItems": posts.length,
-    "url": `https://colosseumroman.com/tours/${category.slug.current}`,
-    
-    // ❌ ELIMINAR ESTAS LÍNEAS (35-42) - Este es el error
-    // NO va aggregateRating dentro de ItemList
-    
-    // 🆕 CADA TOUR COMO LISTITEM CON DATOS COMPLETOS
-    "itemListElement": posts.map((post: any, index: number) => {
-      const image = getBestImage(post);
-      
-      return {
-        "@type": "ListItem",
-        "position": index + 1,
-        "url": `https://colosseumroman.com/tour/${post.slug.current}`,
-        "item": {
-          "@type": "Product",
-          "name": post.title,
-          "description": post.seoDescription || post.title,
-          ...(image && {
-            "image": urlFor(image).width(800).height(400).format('webp').quality(85).url()
-          }),
-          
-          // 🆕 OFFER (PRECIO)
-          ...(post.tourInfo?.price && {
-            "offers": {
-              "@type": "Offer",
-              "price": post.tourInfo.price,
-              "priceCurrency": post.tourInfo.currency || "USD",
-              "priceValidUntil": priceValidUntilString,
-              "availability": "https://schema.org/InStock",
-              "url": `https://colosseumroman.com/tour/${post.slug.current}`,
-              "seller": {
-                "@type": "Organization",
-                "name": "Colosseum Roman"
-              }
-            }
-          }),
-          
-          // 🆕 AGGREGATE RATING DEL TOUR
-          ...(post.getYourGuideData?.rating && {
-            "aggregateRating": {
-              "@type": "AggregateRating",
-              "ratingValue": post.getYourGuideData.rating.toFixed(1),
-              "bestRating": "5",
-              "worstRating": "1",
-              "ratingCount": post.getYourGuideData.reviewCount || 1
-            }
-          }),
-          
-          // 🆕 CARACTERÍSTICAS DESTACADAS - SÍ VAN, ESTÁN BIEN
-          "additionalProperty": [
-            ...(post.tourInfo?.duration ? [{
-              "@type": "PropertyValue",
-              "name": "Duration",
-              "value": post.tourInfo.duration
-            }] : []),
-            ...(post.tourFeatures?.skipTheLine ? [{
-              "@type": "PropertyValue",
-              "name": "Skip the Line",
-              "value": "true"
-            }] : []),
-            ...(post.tourFeatures?.freeCancellation ? [{
-              "@type": "PropertyValue",
-              "name": "Free Cancellation",
-              "value": "true"
-            }] : []),
-            ...(post.tourFeatures?.smallGroupAvailable ? [{
-              "@type": "PropertyValue",
-              "name": "Small Group Available",
-              "value": "true"
-            }] : [])
-          ]
-        }
-      };
-    })
-  },
-  
-  // 🆕 FAQ ESTRUCTURADAS
-  "mainEntity": categoryFAQs.map(faq => ({
-    "@type": "Question",
-    "name": faq.question,
-    "acceptedAnswer": {
-      "@type": "Answer",
-      "text": faq.answer
-    }
-  })),
-  
-  // BREADCRUMB
-  "breadcrumb": {
-    "@type": "BreadcrumbList",
-    "itemListElement": [
-      {
-        "@type": "ListItem",
-        "position": 1,
-        "name": "Home",
-        "item": "https://colosseumroman.com"
-      },
-      {
-        "@type": "ListItem",
-        "position": 2,
-        "name": "Complete Colosseum Guide",
-        "item": "https://colosseumroman.com/complete-guide-to-visiting-the-roman-colosseum-step-by-step"
-      },
-      {
-        "@type": "ListItem",
-        "position": 3,
-        "name": `${category.title} Tours`,
-        "item": `https://colosseumroman.com/tours/${category.slug.current}`
+  // 🆕 SCHEMA COMPLETO CON ITEMLIST DETALLADO Y FAQ
+  const categorySchema = {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    "name": category.seoTitle || `${category.title} Tours`,
+    "description": category.seoDescription || category.description,
+    "url": `${SITE_URL}/tours/${category.slug.current}`,
+    "image": category.seoImage?.asset?.url || category.image?.asset?.url,
+
+    // 🆕 ORGANIZATION
+    "publisher": {
+      "@type": "Organization",
+      "name": SITE_NAME,
+      "url": SITE_URL,
+      "logo": {
+        "@type": "ImageObject",
+        "url": `${SITE_URL}/logo.png`
       }
-    ]
-  }
-};
+    },
+
+    "about": {
+      "@type": "TouristDestination",
+      "name": category.title,
+      "description": category.longDescription || category.description,
+      "url": `${SITE_URL}/tours/${category.slug.current}`
+    },
+
+    // ✅ LISTA DE TOURS
+    "hasPart": {
+      "@type": "ItemList",
+      "name": `${category.title} Tours Collection`,
+      "description": `Curated tours and experiences in ${category.title}`,
+      "numberOfItems": posts.length,
+      "url": `${SITE_URL}/tours/${category.slug.current}`,
+
+      // 🆕 CADA TOUR COMO LISTITEM CON DATOS COMPLETOS
+      "itemListElement": posts.map((post: any, index: number) => {
+        const image = getBestImage(post);
+
+        return {
+          "@type": "ListItem",
+          "position": index + 1,
+          "url": `${SITE_URL}/tour/${post.slug.current}`,
+          "item": {
+            "@type": "Product",
+            "name": post.title,
+            "description": post.seoDescription || post.title,
+            ...(image && {
+              "image": urlFor(image).width(800).height(400).format('webp').quality(85).url()
+            }),
+
+            // 🆕 OFFER (PRECIO)
+            ...(post.tourInfo?.price && {
+              "offers": {
+                "@type": "Offer",
+                "price": post.tourInfo.price,
+                "priceCurrency": post.tourInfo.currency || "USD",
+                "priceValidUntil": priceValidUntilString,
+                "availability": "https://schema.org/InStock",
+                "url": `${SITE_URL}/tour/${post.slug.current}`,
+                "seller": {
+                  "@type": "Organization",
+                  "name": SITE_NAME
+                }
+              }
+            }),
+
+            // 🆕 AGGREGATE RATING DEL TOUR
+            ...(post.getYourGuideData?.rating && {
+              "aggregateRating": {
+                "@type": "AggregateRating",
+                "ratingValue": post.getYourGuideData.rating.toFixed(1),
+                "bestRating": "5",
+                "worstRating": "1",
+                "ratingCount": post.getYourGuideData.reviewCount || 1
+              }
+            }),
+
+            // 🆕 CARACTERÍSTICAS DESTACADAS
+            "additionalProperty": [
+              ...(post.tourInfo?.duration ? [{
+                "@type": "PropertyValue",
+                "name": "Duration",
+                "value": post.tourInfo.duration
+              }] : []),
+              ...(post.tourFeatures?.skipTheLine ? [{
+                "@type": "PropertyValue",
+                "name": "Skip the Line",
+                "value": "true"
+              }] : []),
+              ...(post.tourFeatures?.freeCancellation ? [{
+                "@type": "PropertyValue",
+                "name": "Free Cancellation",
+                "value": "true"
+              }] : []),
+              ...(post.tourFeatures?.smallGroupAvailable ? [{
+                "@type": "PropertyValue",
+                "name": "Small Group Available",
+                "value": "true"
+              }] : [])
+            ]
+          }
+        };
+      })
+    },
+
+    // 🆕 FAQ ESTRUCTURADAS
+    "mainEntity": categoryFAQs.map((faq: any) => ({
+      "@type": "Question",
+      "name": faq.question,
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": faq.answer
+      }
+    })),
+
+    // BREADCRUMB
+    "breadcrumb": {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Home",
+          "item": SITE_URL
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Scooter Tours Guide",
+          "item": `${SITE_URL}/guide`
+        },
+        {
+          "@type": "ListItem",
+          "position": 3,
+          "name": `${category.title} Tours`,
+          "item": `${SITE_URL}/tours/${category.slug.current}`
+        }
+      ]
+    }
+  };
 
   return (
     <>
@@ -388,25 +392,25 @@ const categorySchema = {
       />
 
       <Container>
-        <h1 style={{ 
-          fontSize: 'clamp(2rem, 5vw, 3rem)', 
-          fontWeight: 'bold', 
+        <h1 style={{
+          fontSize: 'clamp(2rem, 5vw, 3rem)',
+          fontWeight: 'bold',
           marginBottom: '1rem',
           color: '#1a1a1a',
           lineHeight: '1.1'
         }}>
           {category.pageContent?.heroTitle || category.title}
         </h1>
-        
+
         <Breadcrumbs items={[
           { label: 'Home', href: '/' },
-          { 
-            label: 'Complete Colosseum Guide', 
-            href: '/complete-guide-to-visiting-the-roman-colosseum-step-by-step' 
+          {
+            label: 'Scooter Tours Guide',
+            href: '/guide'
           },
           { label: `${category.title} Tours`, isActive: true }
         ]} />
-        
+
         {(category.pageContent?.heroSubtitle || category.description) && (
           <div style={{
             display: 'flex',
@@ -414,7 +418,7 @@ const categorySchema = {
             gap: '0.5rem',
             marginBottom: '1rem'
           }}>
-            <span style={{ fontSize: '1.2rem' }}>🎫</span>
+            <span style={{ fontSize: '1.2rem' }}>🛵</span>
             <span style={{
               fontSize: '1.1rem',
               color: '#666',
@@ -426,19 +430,19 @@ const categorySchema = {
         )}
       </Container>
       <Container>
-        <div style={{
-          position: 'relative',
-          height: '40vh',
-          minHeight: '300px',
-          overflow: 'hidden',
-          marginBottom: '3rem',
-          borderRadius: '12px'
-        }}>
-          <div style={{
+      <div style={{
+  position: 'relative',
+  aspectRatio: '3 / 1',
+  width: '100%',
+  overflow: 'hidden',
+  marginBottom: '3rem',
+  borderRadius: '12px'
+}}>
+       <div style={{
             position: 'absolute',
             inset: 0,
-            backgroundImage: category.image?.asset?.url ? 
-              `url(${urlFor(category.image).width(1200).height(600).format('webp').quality(85).url()})` : 
+            backgroundImage: category.image?.asset?.url ?
+              `url(${urlFor(category.image).width(1200).format('webp').quality(85).url()})` :
               'linear-gradient(135deg, #8816c0 0%, #8f3985 100%)',
             backgroundSize: 'cover',
             backgroundPosition: 'center'
@@ -482,9 +486,22 @@ const categorySchema = {
           )}
         </div>
       </Container>
-
-      <Container>
-        <div style={{ padding: '60px 0' }}>
+      
+       {/* 🆕 CONTENIDO EDITORIAL */}
+       {category.longDescription && (
+        <Container>
+         <CategoryEditorialContent 
+  cityName={category.title
+    .replace(/:.*$/, '')
+    .replace(/\s*(Vespa|Scooter)\s*Tours?/gi, '')
+    .trim()}
+  content={category.longDescription}
+/>
+        </Container>
+      )}
+      
+   <Container>
+         <div style={{ padding: '24px 0 60px 0' }}>
           <h2 style={{
             fontSize: '2rem',
             fontWeight: '700',
@@ -493,7 +510,7 @@ const categorySchema = {
           }}>
             Continue planning
           </h2>
-          
+
           {posts.length === 0 ? (
             <div style={{ textAlign: 'center', padding: '40px' }}>
               <p style={{ fontSize: '1.1rem', color: '#666' }}>
@@ -508,10 +525,10 @@ const categorySchema = {
             }}>
               {posts.map((post: any) => {
                 const image = getBestImage(post);
-                
+
                 return (
-                  <div 
-                    key={post.slug.current} 
+                  <div
+                    key={post.slug.current}
                     style={{
                       background: '#fff',
                       borderRadius: '12px',
@@ -523,8 +540,7 @@ const categorySchema = {
                       justifySelf: 'center'
                     }}
                   >
-                    <a 
-                      href={`/tour/${post.slug.current}`}
+                    <a href={`/tour/${post.slug.current}`}
                       style={{ textDecoration: 'none', color: 'inherit' }}
                     >
                       <div style={{ position: 'relative', height: '160px' }}>
@@ -556,13 +572,13 @@ const categorySchema = {
                             color: 'white',
                             fontSize: '1.5rem'
                           }}>
-                            📍
+                            🛵
                           </div>
                         )}
                       </div>
-                      
+
                       <div style={{ padding: '16px' }}>
-                        <h3 style={{ 
+                        <h3 style={{
                           fontSize: '1.1rem',
                           fontWeight: '600',
                           marginBottom: '8px',
@@ -576,7 +592,7 @@ const categorySchema = {
                         }}>
                           {post.title}
                         </h3>
-                        
+
                         {/* 🆕 RATING */}
                         {post.getYourGuideData?.rating && (
                           <div style={{ marginBottom: '10px', display: 'flex', alignItems: 'center', gap: '6px' }}>
@@ -644,7 +660,7 @@ const categorySchema = {
                             </span>
                           )}
                         </div>
-                        
+
                         {post.seoDescription && (
                           <p style={{
                             fontSize: '0.85rem',
@@ -660,7 +676,7 @@ const categorySchema = {
                             {post.seoDescription.substring(0, 80)}...
                           </p>
                         )}
-                        
+
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 'auto' }}>
                           {post.tourInfo?.duration && (
                             <div style={{

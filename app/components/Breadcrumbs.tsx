@@ -97,7 +97,7 @@ export default function Breadcrumbs({ items, className = '' }: BreadcrumbsProps)
               "@type": "ListItem",
               "position": index + 1,
               "name": item.label,
-              ...(item.href && { "item": `https://colosseumroman.com${item.href}` })
+              ...(item.href && { "item": `https://scooterstour.com${item.href}` })
             }))
           })
         }}

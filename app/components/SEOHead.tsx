@@ -41,7 +41,7 @@ export default function SEOHead({
   seoImage,
   tourInfo,
   publishedAt,
-  siteName = "ColosseumRoman.com",
+  siteName = "scooterstour.com",
   language = "en"
 }: SEOHeadProps) {
   

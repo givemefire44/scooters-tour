@@ -33,11 +33,12 @@ body {
 
 /* HERO SECTION */
 .hero-section {
-  background: linear-gradient(135deg, #8816c0 0%, #8f3985 100%);
+  background: url('/images/vespa-verona.jpg') center center/cover no-repeat;
   padding: 48px 0 32px 0;
   border-radius: 32px;
   box-shadow: 0 8px 32px rgba(80,0,80,0.10);
-  margin: 0px 0 0 0;
+  margin: 0;
+  min-height: 500px; /* Altura del hero */
 }
 
 /* Container centrado y ancho máximo */
@@ -45,31 +46,33 @@ body {
   max-width: 1000px;
   margin: 0 auto;
   position: relative;
+  min-height: 500px; /* Igual que hero-section */
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between; /* Separa títulos arriba y buscador abajo */
 }
 
 /* Título */
 .hero-title {
-  color: #fff700;
+  color: #faf8f8;
   font-size: 3rem;
   margin-bottom: 8px;
   font-weight: 700;
   letter-spacing: 1px;
-  margin-left: 30px;
-  margin-top: 0;
-  transform: translateY(-15px);
+  margin-left: 0px;
+  margin-top: 220px;
   text-shadow: 0 2px 10px rgba(0,0,0,0.10);
-  text-align: left;
+  text-align: center;;
 }
 
 .hero-subtitle {
-  color: #fff700;
+  color: #fffafa;
   font-size: 1.5rem;
   font-weight: 500;
-  margin-bottom: 32px;
-  margin-left: 30px;
+  margin-bottom: auto; /* Empuja todo lo demás hacia abajo */
+  margin-left: 0px;
   margin-top: 0;
-  transform: translateY(-15px);
-  text-align: left;
+  text-align: center;
 }
 
 /* RESPONSIVE PARA TÍTULOS */
@@ -120,23 +123,25 @@ body {
 
 /* CitySearch margin */
 .city-search-container {
-  margin-top: 32px;
+  margin-top: auto; /* Se pega al fondo */
+  margin-bottom: 16px;
 }
 
 /* Texto de cancelación */
 .cancellation-text {
-  color: #fff700;
+  color: #fff;
   font-weight: 700;
-  margin-top: 24px;
-  padding-top: 10px;
-  display: block;
+  margin-top: 12px;
+  margin-bottom: 24px;
+  padding: 4px 12px;
+  display: inline-block; /* ← Cambia de block a inline-block */
   text-align: center;
-  font-size: 18px;
+  font-size: 15px;
   max-width: 600px;
   margin-left: auto;
   margin-right: auto;
-  background: none;
-  border-radius: 0;
+  background: #0066ff;
+  border-radius: 3px;
 }
 /* Responsive */
 @media (max-width: 768px) {
@@ -212,7 +217,7 @@ body {
 /* ---- CitySearch styles ---- */
 .search-bar-wrap {
   width: 100%;
-  max-width: 780px;
+  max-width: 450px;
   margin: 0 auto;
   position: relative;
   z-index: 4;
@@ -225,7 +230,7 @@ body {
   box-shadow: 0 5px 32px #0001;
   padding: 4px 18px 4px 22px;
   gap: 10px;
-  min-height: 64px;
+  min-height: 52px;
 }
 .search-icon {
   display: flex;
@@ -234,9 +239,9 @@ body {
   flex: 1 1 0%;
   border: none;
   outline: none;
-  font-size: 1.32rem;
+  font-size: 1.2rem;
   background: none;
-  padding: 19px 9px 18px 9px;
+  padding: 12px 9px 18px 9px;
   font-weight: 400;
 }
 .clear-btn {
@@ -252,9 +257,9 @@ body {
   color: #6b4700;
   border: none;
   border-radius: 16px;
-  font-size: 1.21rem;
+  font-size: 1.1rem;
   font-weight: 800;
-  padding: 12px 40px;
+  padding: 10px 32px;
   margin: 0 0 0 16px;
   cursor: pointer;
   box-shadow: 0 1px 6px #0001;
@@ -546,7 +551,8 @@ body {
 .testimonial-carousel blockquote {
   font-size: 1.3rem;
   font-style: italic;
-  color: #7e2fbf;
+  font-weight: 500;
+  color: #1e40af;
   margin: 0;
 }
 
@@ -573,7 +579,7 @@ body {
 }
 
 .testimonial-carousel-dot.active {
-  background: #7e2fbf;
+  background: #1e40af;
 }
 
 @media (max-width: 600px) {
@@ -622,16 +628,16 @@ body {
     font-size: 2.2rem;
     font-weight: 800;
     margin-bottom: 8px;
-    line-height: 1.1;
+    line-height: 1.2;
   }
   
   .hostel-mosaic-info .highlight {
-    color: #22c55e;
+    color: #63c073;
   }
   
   .hostel-mosaic-info-description {
-    font-size: 1.1rem;
-    color: #333;
+    font-size: 1.7rem;
+    color: #333333;
     margin-bottom: 16px;
   }
   
@@ -822,8 +828,8 @@ body {
   /* ImpactBanner styles */
 /* ImpactBanner styles (recto, dentro del container) */
 .impact-banner {
-  background: #7e2fbf;
-  color: #FFD600;
+  background: #1e40af;
+  color: #fff;
   width: 100%;
   margin: 0 auto 0 auto;
   padding: 54px 0 38px 0;
@@ -850,13 +856,14 @@ body {
 }
 
 .impact-banner h2 span {
-  color: #FFD600;
+  color: #ffd600;
   background: rgba(0,0,0,0.08);
   border-radius: 7px;
   padding: 0 4px;
 }
 
 .impact-banner-arrow {
+  color: #ffd600;
   margin-top: 18px;
   display: flex;
   justify-content: center;
@@ -1314,69 +1321,6 @@ body {
   transform: scale(1.1);
 }
 
-/* ========================================
-   HERO GALLERY STYLES
-   ======================================== */
-   /* CONTAINER PRINCIPAL DEL HERO */
-
-   .hero-gallery {
-     display: grid;
-     grid-template-columns: 1.2fr 1.4fr;
-     gap: 2px;
-     height: 420px;
-     border-radius: 16px;
-     overflow: hidden;
-     margin: 20px 0;
-   }
-   
-   /* IMAGEN PRINCIPAL (IZQUIERDA) */
-   .hero-main-image {
-     position: relative;
-     border-radius: 16px 0 0 16px;
-     overflow: hidden;
-     height: 100%;
-   }
-   
-   /* GRID DE IMÁGENES SECUNDARIAS (DERECHA) */
-   .hero-grid {
-     display: grid;
-     grid-template-columns: 1fr 1fr;
-     grid-template-rows: 1fr 1fr;
-     gap: 2px;
-     height: 100%;
-   }
-   
-   /* CADA IMAGEN DEL GRID */
-   .hero-grid-item {
-     position: relative;
-     height: 100%;
-     border-radius: 8px;
-     overflow: hidden;
-   }
-   
-   /* RESPONSIVE - MOBILE */
-   @media (max-width: 768px) {
-     .hero-gallery {
-       grid-template-columns: 1fr;
-       height: 300px;
-       gap: 8px;
-     }
-     
-     .hero-main-image {
-       border-radius: 16px 16px 0 0;
-       height: 200px;
-     }
-     
-     .hero-grid {
-       grid-template-columns: repeat(4, 1fr);
-       grid-template-rows: 1fr;
-       height: 80px;
-     }
-     
-     .hero-grid-item {
-       border-radius: 4px;
-     }
-   }
 
 /* TÍTULOS Y CONTENIDO DEL SANITY
    ======================================== */
@@ -1571,7 +1515,7 @@ body {
   margin: 40px auto; /* AUTO para centrar */
   display: flex;
   justify-content: center;
-  width: 100%; /* Ancho completo disponible */
+  width: 50%; /* Ancho completo disponible */
 }
 
 /* LAYOUT: 2 COLUMNAS */
@@ -1666,46 +1610,7 @@ body {
   }
 }
 
-/* MOBILE */
-@media (max-width: 768px) {
-  .tour-title {
-    font-size: 2rem;
-    margin: 20px 0 15px 0;
-    text-align: center;
-  }
-  
-  .tour-layout {
-    grid-template-columns: 1fr;
-    gap: 30px;
-  }
-  
-  .tour-widget {
-    position: static;
-    order: -1; /* Widget arriba en mobile */
-  }
-  
-  .tour-widget-card {
-    width: 100%;
-    max-width: 400px;
-    margin: 0 auto;
-  }
-  
-  .hero-gallery {
-    grid-template-columns: 1fr;
-    height: auto;
-    margin: 15px 0;
-  }
-  
-  .hero-main-image {
-    height: 250px;
-    border-radius: 16px 16px 0 0;
-  }
-  
-  .hero-grid {
-    grid-template-columns: repeat(4, 1fr);
-    height: 120px;
-  }
-}
+
 /* ========================================
    RECOMMENDED TOURS STYLE TWO COLUMNS
    ======================================== */
@@ -2912,3 +2817,6 @@ input, textarea, select {
     page-break-after: avoid;
   }
 }
+
+
+

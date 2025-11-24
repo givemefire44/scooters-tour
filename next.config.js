@@ -41,20 +41,20 @@ const nextConfig = {
     ];
   },
 
-  // 🔁 **AQUÍ LA REDIRECCIÓN DE HOST** (www -> apex) + opcional vercel.app -> dominio
+  // 🔁 REDIRECTS - www -> apex + vercel.app -> dominio
   async redirects() {
     return [
       {
         source: '/:path*',
-        has: [{ type: 'host', value: 'www.colosseumroman.com' }],
-        destination: 'https://colosseumroman.com/:path*',
-        permanent: true, // 308 en Vercel
+        has: [{ type: 'host', value: 'www.scooterstour.com' }],
+        destination: 'https://scooterstour.com/:path*',
+        permanent: true,
       },
       {
-        // opcional: fuerza vercel.app al dominio canónico
+        // Redirect de vercel.app al dominio canónico
         source: '/:path*',
-        has: [{ type: 'host', value: 'colosseumroman.vercel.app' }],
-        destination: 'https://colosseumroman.com/:path*',
+        has: [{ type: 'host', value: '.vercel.app' }],
+        destination: 'https://scooterstour.com/:path*',
         permanent: true,
       },
     ];

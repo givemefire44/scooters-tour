@@ -23,7 +23,7 @@ export const pageType: SchemaTypeDefinition = defineType({
         maxLength: 96,
       },
       validation: (Rule) => Rule.required(),
-      description: 'This will be the URL: colosseumroman.com/[slug]'
+      description: 'This will be the URL: scooterstour.com/[slug]'
     }),
     
     // Agregar este campo después del slug en page.ts (línea aproximada 25)

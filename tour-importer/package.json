@@ -1,0 +1,27 @@
+{
+  "name": "tour-importer",
+  "version": "1.0.0",
+  "description": "Automated tour importer from GetYourGuide to Sanity",
+  "main": "src/index.js",
+  "type": "module",
+  "scripts": {
+    "import": "node src/index.js",
+    "test": "DRY_RUN=true node src/index.js"
+  },
+  "keywords": [
+    "getyourguide",
+    "sanity",
+    "scraper"
+  ],
+  "author": "Mario Dalo",
+  "license": "ISC",
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.68.0",
+    "@sanity/client": "^7.12.1",
+    "dotenv": "^17.2.3",
+    "puppeteer": "^24.30.0",
+    "puppeteer-extra": "^3.3.6",
+    "puppeteer-extra-plugin-stealth": "^2.11.2",
+    "sharp": "^0.34.5"
+  }
+}

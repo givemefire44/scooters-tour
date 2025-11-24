@@ -202,13 +202,8 @@ export default function RelatedTours({ tours }: RelatedToursProps) {
           })}
         </div>
 
-        {/* BOTÓN VER MÁS - LINKEABLE */}
-        <div className="tours-footer">
-          <Link href="/tours/colosseum" className="view-all-button">
-            See All Colosseum Tours
-          </Link>
-        </div>
       </div>
+     
 
       {/* ESTILOS INTEGRADOS */}
       <style jsx>{`

@@ -166,8 +166,8 @@ export default function MinimalHeader() {
   const handleShare = () => {
     if (navigator.share) {
       navigator.share({
-        title: 'ColosseumRoman.com',
-        text: "Look what I found - best Colosseum tours in Rome! 🏛️",
+        title: 'ScootersTour.com',
+        text: "Look what I found - best Scooters Tour! 🛵",
         url: window.location.href
       });
     } else {
@@ -212,7 +212,7 @@ export default function MinimalHeader() {
             color: '#8816c0',
             textDecoration: 'none'
           }}>
-            ColosseumRoman.com
+            ScootersTour.com 🛵
           </Link>
 
           {/* ACCIONES - DESKTOP */}

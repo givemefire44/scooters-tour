@@ -8,8 +8,8 @@ export interface ProTip {
     
     {
       icon: '📖',
-      text: 'Complete Colosseum Guide — everything you need to know.',
-      slug: 'complete-guide-to-visiting-the-roman-colosseum-step-by-step'
+      text: 'Complete Guide to Booking Scooters— everything you need to know.',
+      slug: 'guide-to-booking-scooter-tours-and-rentals-safely'
     },
     {
       icon: '🕳️',

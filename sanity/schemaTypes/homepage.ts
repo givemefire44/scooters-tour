@@ -198,7 +198,7 @@ export const homepageType = defineType({
           name: 'organizationName',
           type: 'string',
           title: 'Organization Name',
-          initialValue: 'ColosseumRoman'
+          initialValue: 'ScootersTour'
         },
         {
           name: 'organizationType',

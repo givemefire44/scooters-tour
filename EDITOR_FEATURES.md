@@ -1,4 +1,4 @@
-# Editor.js - Blog Editor - ColosseumRoman
+# Editor.js - Blog Editor - 
 
 ## Migración Completa a Editor.js
 

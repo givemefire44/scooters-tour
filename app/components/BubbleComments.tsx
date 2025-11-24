@@ -2,10 +2,10 @@ import React from "react";
 
 // Puedes cambiar estos links por tus propios avatares cuando quieras
 const avatars = [
-  "https://randomuser.me/api/portraits/women/44.jpg",
-  "https://randomuser.me/api/portraits/men/32.jpg",
-  "https://randomuser.me/api/portraits/men/54.jpg",
-  "https://randomuser.me/api/portraits/women/68.jpg",
+  "/images/rider-4.jpg",
+  "/images/rider-2.jpg",
+  "/images/rider-3.jpg",
+  "/images/rider-1.jpg",
 ];
 export default function BubbleComments({ comments }: { comments: any[] }) {
   return (

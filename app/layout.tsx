@@ -28,7 +28,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   
         {/* PRECONNECT PARA MEJORAR VELOCIDAD */}
         <link rel="preconnect" href="https://www.googletagmanager.com" />
-        <link rel="preconnect" href="https://widget.getyourguide.com" />
         <link rel="dns-prefetch" href="https://www.google-analytics.com" />
       </head>
       <body suppressHydrationWarning={true}>
@@ -47,12 +46,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         {/* COMPONENTE PARA GA4 DIFERIDO */}
         <DeferredGA />
         
-        {/* SOLO GETYOURGUIDE */}
-        <Script
-          src="https://widget.getyourguide.com/dist/pa.umd.production.min.js"
-          data-gyg-partner-id={process.env.NEXT_PUBLIC_GETYOURGUIDE_PARTNER_ID}
-          strategy="lazyOnload"
-        />
+     
       </body>
     </html>
   );

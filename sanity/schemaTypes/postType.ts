@@ -193,7 +193,7 @@ export const postType = defineType({
           name: 'provider',
           type: 'string',
           title: 'Proveedor del Tour',
-          initialValue: 'ColosseumRoman.com'
+          initialValue: 'scooterstour.com'
         })
       ],
       options: {

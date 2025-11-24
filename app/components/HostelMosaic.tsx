@@ -70,10 +70,10 @@ export default function HostelMosaic() {
         <div className="hostel-mosaic-container">
           <div className="hostel-mosaic-info">
             <h2>
-              <span className="highlight">Unforgettable tours and excursions at the Roman Colosseum.</span>
+              <span className="highlight">Unforgettable tours on two wheels, feel the wind, live the adventure.</span>
             </h2>
             <div className="hostel-mosaic-info-description">
-              Don't forget to get your ticket for the Roman Colosseum.
+              Don't forget book your Scooter Tour in Advance!
             </div>
           </div>
           <div style={{ padding: '40px', textAlign: 'center', color: '#666' }}>
@@ -94,10 +94,10 @@ export default function HostelMosaic() {
       <div className="hostel-mosaic-container">
         <div className="hostel-mosaic-info">
           <h2>
-            <span className="highlight">Unforgettable tours and excursions at the Roman Colosseum.</span>
+            <span className="highlight">Unforgettable tours on two wheels, feel the wind, live the adventure.</span>
           </h2>
           <div className="hostel-mosaic-info-description">
-            Don't forget to get your ticket for the Roman Colosseum.
+          Don't forget book your Scooter Tour in Advance!
           </div>
         </div>
         <div className="hostel-mosaic-list">
@@ -118,7 +118,6 @@ export default function HostelMosaic() {
                     transition: 'transform 0.3s ease'
                   }}
                   sizes="(max-width: 768px) 100vw, (max-width: 1200px) 33vw, 25vw"
-                  loading="lazy"
                   placeholder="blur"
                   blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWGRkqGx0f/EABUBAQEAAAAAAAAAAAAAAAAAAAMF/8QAGhEAAgIDAAAAAAAAAAAAAAAAAAECEgMRkf/aAAwDAQACEQMRAD8AltJagyeH0AthI5xdrLcNM91BF5pX2HaH9bcfaSXWGaRmknyJckliyjqTzSlT54b6bk+h0R//2Q=="
                 />

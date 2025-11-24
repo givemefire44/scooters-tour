@@ -130,15 +130,15 @@ export default function Footer() {
           {/* LOGO Y DESCRIPCIÓN */}
           <div className="footer-brand">
             <div className="footer-logo">
-              <h3>ColosseumRoman.com</h3>
+              <h3>ScootersTours.com</h3>
             </div>
             <p className="footer-description">
-              Your trusted guide to Rome's most incredible tours and experiences. 
-              Discover the Eternal City with expert local guides and skip-the-line access.
+            Your gateway to unforgettable scooter adventures in the world's most iconic cities.
+            Feel the wind, explore hidden gems, and ride through destinations with expert local guides.
             </p>
             <div className="footer-contact">
-              <p>📧 info@colosseumroman.com</p>
-              <p>📍 Rome, Italy</p>
+              <p>📧 hello@scooterstour.com</p>
+              <p>📍Worldwide</p>
             </div>
           </div>
 
@@ -175,7 +175,7 @@ export default function Footer() {
         {/* FOOTER BOTTOM */}
         <div className="footer-bottom">
           <div className="footer-bottom-content">
-            <p>&copy; 2024 ColosseumRoman.com. All rights reserved.</p>
+            <p>&copy; 2024 ScootersTour.com. All rights reserved.</p>
             <div className="footer-powered">
               <span>Powered by </span>
               <Link href="https://intercoper.com" target="_blank" rel="noopener noreferrer">
@@ -357,7 +357,7 @@ export default function Footer() {
         }
 
         .footer-powered a {
-          color: #e91e63;
+          color: #ec3c45;
           text-decoration: none;
           font-weight: 600;
           transition: color 0.2s ease;

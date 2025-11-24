@@ -1,6 +1,8 @@
 "use client";
 import React, { useState, useRef, useEffect } from "react";
 
+const SITE_NAME = process.env.NEXT_PUBLIC_SITE_NAME || 'ScootersTour';
+
 interface Tour {
   id: string;
   name: string;
@@ -159,7 +161,7 @@ export default function TourHeader() {
             flexShrink: 0,
             marginRight: 10
           }}>
-            ColosseumRoman.com
+            {SITE_NAME}
           </div>
 
           {/* BÚSQUEDA - SOLO BOTÓN PARA ABRIR MODAL */}

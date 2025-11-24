@@ -11,7 +11,7 @@ type SitemapEntry = {
 }
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = 'https://colosseumroman.com'
+  const baseUrl = 'https://.com'
   
   console.log('🔍 SITEMAP EJECUTÁNDOSE - GENERANDO URLs...')
   

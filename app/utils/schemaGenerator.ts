@@ -104,7 +104,7 @@ interface PageData {
   itemReviewed?: any;
 }
 
-export function generatePageSchema(pageData: PageData, baseUrl = 'https://colosseumroman.com'): Schema {
+export function generatePageSchema(pageData: PageData, baseUrl = 'https://scooterstour.com'): Schema {
   // 🆕 SPECIAL CASE: About Us Page
   if (pageData.slug.current === 'about-us') {
     return {
@@ -112,23 +112,25 @@ export function generatePageSchema(pageData: PageData, baseUrl = 'https://coloss
       '@type': 'AboutPage',
       mainEntity: {
         '@type': 'Organization',
-        name: 'Colosseum Roman',
-        alternateName: 'ColosseumRoman.com',
-        url: 'https://colosseumroman.com',
-        logo: 'https://colosseumroman.com/logo.png',
+        name: 'Scooters Tour',
+        alternateName: 'scooterstour.com',
+        url: 'https://scooterstour.com',
+        logo: 'https://scooterstour.com/logo.png',
         foundingDate: '2006',
-        description: 'Expert curators of the best Colosseum tours and comprehensive Rome travel guides. Independent affiliate partner of GetYourGuide and Viator.',
+        description: 'Expert curators of the best scooter and Vespa tours worldwide. Your trusted guide for discovering cities on two wheels through authentic local experiences.',
         
         founder: {
           '@type': 'Person',
           name: 'Mario Dalo',
-          jobTitle: 'Founder & Rome Travel Curator',
+          jobTitle: 'Founder & Scooter Tour Curator',
           nationality: 'Argentine',
           knowsAbout: [
-            'Roman Colosseum',
-            'Rome Tourism',
-            'Historical Tours',
-            'Travel Planning'
+            'Scooter Tours',
+            'Vespa Tours',
+            'City Exploration',
+            'Urban Tourism',
+            'Travel Planning',
+            'Motorcycle Tours'
           ],
           sameAs: [
             'https://linkedin.com/in/mariodalo'
@@ -151,26 +153,27 @@ export function generatePageSchema(pageData: PageData, baseUrl = 'https://coloss
         
         areaServed: {
           '@type': 'Place',
-          name: 'Rome, Italy'
+          name: 'Global'
         },
         
         knowsAbout: [
-          'Roman Colosseum',
-          'Ancient Rome History',
-          'Rome Tourism',
-          'Historical Tours',
+          'Scooter Tours',
+          'Vespa Tours',
+          'Rome Scooter Adventures',
+          'Paris Vespa Tours',
+          'City Exploration',
           'Travel Planning',
-          'Roman Forum',
-          'Palatine Hill'
+          'Urban Tourism',
+          'Motorcycle Tours'
         ],
         
         sameAs: [
-          'https://instagram.com/colosseumroman'
+          'https://instagram.com/scooterstour.com'
         ],
         
         contactPoint: {
           '@type': 'ContactPoint',
-          email: 'hello@colosseumroman.com',
+          email: 'hello@scooterstour.com',
           contactType: 'Customer Service',
           availableLanguage: ['English', 'Spanish']
         }
@@ -196,18 +199,18 @@ export function generatePageSchema(pageData: PageData, baseUrl = 'https://coloss
     datePublished: pageData.publishedAt,
     author: {
       '@type': 'Organization',
-      name: 'Colosseum Roman',
-      url: 'https://colosseumroman.com'
+      name: 'Scooters Tour',
+      url: 'https://scooterstour.com'
     },
     publisher: {
       '@type': 'Organization',
-      name: 'Colosseum Roman',
+      name: 'Scooters Tour',
       logo: {
         '@type': 'ImageObject',
-        url: 'https://colosseumroman.com/logo.png',
-        alt: 'Colosseum Roman Logo'
+        url: 'https://scooterstour.com/logo.png',
+        alt: 'Scooters Tour Logo'
       },
-      url: 'https://colosseumroman.com'
+      url: 'https://scooterstour.com'
     }
   };
 

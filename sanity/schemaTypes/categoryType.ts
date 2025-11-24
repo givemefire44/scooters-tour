@@ -110,6 +110,12 @@ export const categoryType = defineType({
     // CONTENIDO ADICIONAL
     // ========================================
     defineField({
+      name: 'editorialTitle',
+      type: 'string',
+      title: 'Editorial Section Title',
+      description: 'Auto-generated title: "Why You Should Take a Vespa Tour in..."',
+    }),
+    defineField({
       name: 'longDescription',
       type: 'text',
       title: 'Long Description',
@@ -121,6 +127,55 @@ export const categoryType = defineType({
       type: 'string',
       title: 'Featured Text',
       description: 'Short compelling text to highlight this destination',
+    }),
+    
+    // ========================================
+    // 🆕 FAQs FLEXIBLES
+    // ========================================
+    defineField({
+      name: 'faqs',
+      type: 'array',
+      title: 'FAQs',
+      description: 'Frequently Asked Questions for this city (5-15 recommended for SEO)',
+      of: [
+        {
+          type: 'object',
+          title: 'FAQ Item',
+          fields: [
+            {
+              name: 'question',
+              type: 'string',
+              title: 'Question',
+              description: 'The question users might ask',
+              validation: Rule => Rule.required().max(200)
+            },
+            {
+              name: 'answer',
+              type: 'text',
+              title: 'Answer',
+              description: 'Detailed answer (2-4 sentences works best for SEO)',
+              rows: 4,
+              validation: Rule => Rule.required().min(50).max(500)
+            }
+          ],
+          preview: {
+            select: {
+              title: 'question',
+              subtitle: 'answer'
+            },
+            prepare({ title, subtitle }) {
+              return {
+                title: title || 'Empty question',
+                subtitle: subtitle ? `${subtitle.substring(0, 60)}...` : 'No answer'
+              }
+            }
+          }
+        }
+      ],
+      options: {
+        collapsible: true,
+        collapsed: false
+      }
     }),
     
     // ========================================
