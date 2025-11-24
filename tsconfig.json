@@ -22,6 +22,6 @@
       "@/*": ["./*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "next.config.js", "app/layouts/MainHeroLayout.bak", "app/components/Header.bak", "app/components/ConditionalHeader.bak", "app/components/UnifiedAutoLinker.bak"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "next.config.js", "app/layouts/MainHeroLayout.bak", "app/components/Header.bak", "app/components/ConditionalHeader.bak", "app/components/UnifiedAutoLinker.bak", "app/[slug]/page.bak"],
   "exclude": ["node_modules", "backend"]
 }

@@ -1,413 +1,459 @@
-import { notFound } from 'next/navigation'
-import { Metadata } from 'next'
-import { client } from '@/sanity/lib/client'
-import { urlFor } from '@/sanity/lib/image'
-import StaticPageClient from './StaticPageClient'
+import { notFound } from 'next/navigation';
+import { client } from '@/sanity/lib/client';
+import { urlFor } from '@/sanity/lib/image';
+import { Metadata } from 'next';
 
-// Interface expandida para páginas estáticas
-interface SanityPage {
-  title: string;
-  slug: {
-    current: string;
-  };
-  content: any;
-  pageType?: string; // ← NUEVO: 'simple' | 'hero'
-  
-  // Hero fields
-  heroImage?: {
-    asset: { url: string };
-    alt?: string;
-    heading?: string;
-  };
-  heroContent?: {
-    heroTitle?: string;
-    heroSubtitle?: string;
-    excerpt?: string;
-    customText?: string; // ← NUEVO CAMPO
-  };
-  highlights?: Array<{
-    title: string;
-    description?: string;
-    icon?: string;
-  }>;
-  pageSettings?: {
-    showRecommendedTours?: boolean;
-    backgroundColor?: string;
-    ctaText?: string;    // ← NUEVO CAMPO
-    ctaUrl?: string;     // ← NUEVO CAMPO
-  };
-  
-  // SEO fields
-  seoTitle?: string;
-  seoDescription?: string;
-  seoKeywords?: string[];
-  seoImage?: {
-    asset: { url: string };
-    alt?: string;
-  };
-  publishedAt?: string;
-  _updatedAt?: string;
-  seo?: {
-    metaTitle?: string;
-    metaDescription?: string;
-  };
+// Componentes
+import CategoryPageClient from './CategoryPageClient';
+import StaticPageClient from './StaticPageClient';
+import TourPageClient from '@/app/tour/[slug]/TourPageClient';
 
-  // Rich Snippets
-  richSnippets?: {
-    schemaType?: 'Article' | 'HowTo' | 'ItemList' | 'Review' | 'FAQPage' | 'WebPage';
-    readingTime?: number;
-    wordCount?: number;
-    difficulty?: 'Beginner' | 'Intermediate' | 'Advanced';
-    estimatedCost?: {
-      currency: string;
-      minValue?: number;
-      maxValue?: number;
-    };
-    timeRequired?: string;
-    about?: {
-      name: string;
-      type: 'TouristAttraction' | 'Monument' | 'Museum' | 'City' | 'Place';
-    };
-    steps?: Array<{
-      name: string;
-      text: string;
-      url?: string;
-    }>;
-    faqItems?: Array<{
-      question: string;
-      answer: string;
-    }>;
-    itemList?: Array<{
-      name: string;
-      description?: string;
-      url?: string;
-    }>;
-    rating?: {
-      ratingValue: number;
-      bestRating: number;
-      worstRating: number;
-    };
-  };
+// ========================================
+// CONFIGURACIÓN
+// ========================================
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://scooterstour.com';
+const SITE_NAME = process.env.NEXT_PUBLIC_SITE_NAME || 'ScootersTour';
+
+const cacheConfig = {
+  next: { revalidate: 3600 }
+};
+
+// ========================================
+// QUERIES A SANITY
+// ========================================
+
+// QUERY: CATEGORÍA
+async function getCategory(slug: string) {
+  const query = `*[_type == "category" && slug.current == $slug][0]{
+    _type,
+    title,
+    slug,
+    description,
+    longDescription,
+    featuredText,
+    seoTitle,
+    seoDescription,
+    seoKeywords,
+    seoImage {
+      asset-> { url },
+      alt
+    },
+    image {
+      asset-> { url },
+      alt,
+      heading
+    },
+    pageContent{
+      heroTitle,
+      heroSubtitle,
+      highlights[]
+    },
+    faqs[]{
+      question,
+      answer
+    },
+    metaTitle,
+    metaDescription
+  }`;
+
+  return await client.fetch(query, { slug }, cacheConfig);
 }
 
-// ✅ QUERY CORREGIDA - CON TODOS LOS TIPOS DE CONTENIDO E IMÁGENES
-async function getPage(slug: string): Promise<SanityPage | null> {
-  const query = `
-    *[_type == "page" && slug.current == $slug][0] {
-      title,
-      slug,
-      
-      // 🆕 CONTENIDO EXPANDIDO CON TODAS LAS IMÁGENES
-      content[]{
-        ...,
-        // Imagen simple
-        _type == "image" => {
-          _type,
-          asset->{
-            _id,
-            url
-          },
+// QUERY: TOUR
+async function getTour(slug: string) {
+  const query = `*[_type == "post" && slug.current == $slug][0]{
+    _type,
+    title,
+    slug,
+    seoTitle,
+    seoDescription,
+    seoKeywords,
+    seoImage{ asset->{ url }, alt },
+    mainImage{ asset->{ url }, alt },
+    heroGallery[]{ asset->{ url }, alt },
+    body,
+    publishedAt,
+    author->{ name },
+    tourInfo{
+      duration,
+      price,
+      currency,
+      location,
+      provider
+    },
+    tourFeatures{
+      freeCancellation,
+      skipTheLine,
+      wheelchairAccessible,
+      hostGuide,
+      audioGuide,
+      smallGroupAvailable
+    },
+    getYourGuideTourId,
+    getYourGuideUrl,
+    bookingUrl,
+    getYourGuideData{
+      rating,
+      reviewCount,
+      lastUpdated
+    }
+  }`;
+
+  return await client.fetch(query, { slug }, cacheConfig);
+}
+
+// QUERY: PAGE (ESTÁTICA/ARTÍCULO)
+async function getPage(slug: string) {
+  const query = `*[_type == "page" && slug.current == $slug][0]{
+    _type,
+    title,
+    slug,
+    content[]{
+      ...,
+      _type == "image" => {
+        _type,
+        asset->{ _id, url },
+        alt,
+        caption
+      },
+      _type == "imageGallery" => {
+        _type,
+        title,
+        layout,
+        images[]{
+          asset->{ _id, url },
           alt,
           caption
-        },
-        // Galería de imágenes
-        _type == "imageGallery" => {
-          _type,
-          title,
-          layout,
-          images[]{
-            asset->{
-              _id,
-              url
-            },
-            alt,
-            caption
-          }
-        },
-        // Imagen con texto
-        _type == "imageWithText" => {
-          _type,
-          layout,
-          image{
-            asset->{
-              _id,
-              url
-            },
-            alt
-          },
-          text
-        },
-        // CTA Box
-        _type == "ctaBox" => {
-          _type,
-          title,
-          description,
-          buttonText,
-          buttonUrl,
-          style
-        },
-        // Tabla simple
-        _type == "simpleTable" => {
-          _type,
-          title,
-          rows[]{
-            cells[]
-          }
-        },
-        // Bloques de texto con links
-        _type == "block" => {
-          ...,
-          markDefs[]{
-            ...,
-            _type == "link" => {
-              _type,
-              href,
-              blank
-            }
-          }
         }
       },
-      
-      pageType,
-      
-      // Hero fields (pueden no existir en páginas viejas)
-      heroImage{
-        asset->{
-          _id,
-          url
-        },
-        alt,
-        heading
+      _type == "imageWithText" => {
+        _type,
+        layout,
+        image{ asset->{ _id, url }, alt },
+        text
       },
-      heroContent{
-        heroTitle,
-        heroSubtitle,
-        excerpt,
-        customText
-      },
-      highlights[]{
+      _type == "ctaBox" => {
+        _type,
         title,
         description,
-        icon
+        buttonText,
+        buttonUrl,
+        style
       },
-      pageSettings{
-        showRecommendedTours,
-        backgroundColor,
-        ctaText,
-        ctaUrl
+      _type == "simpleTable" => {
+        _type,
+        title,
+        rows[]{ cells[] }
       },
-      
-      // Sidebar Widget
-      sidebarWidget{
-        showWidget,
-        ctaTitle,
-        ctaDescription,
-        ctaButtonText,
-        ctaButtonUrl,
-        widgetImage{
-          asset->{
-            _id,
-            url
-          },
-          alt
-        },
-        quickLinks[]{
-          title,
-          url,
-          icon
-        }
-      },
-      
-      // SEO fields
-      seoTitle,
-      seoDescription,
-      seoKeywords,
-      seoImage{
-        asset->{
-          _id,
-          url
-        },
-        alt
-      },
-      publishedAt,
-      _updatedAt,
-      
-      // LEGACY compatibility
-      seo {
-        metaTitle,
-        metaDescription
-      },
-
-      // 🆕 RICH SNIPPETS
-      richSnippets{
-        schemaType,
-        readingTime,
-        wordCount,
-        difficulty,
-        estimatedCost{
-          currency,
-          minValue,
-          maxValue
-        },
-        timeRequired,
-        about{
-          name,
-          type
-        },
-        steps[]{
-          name,
-          text,
-          url
-        },
-        faqItems[]{
-          question,
-          answer
-        },
-        itemList[]{
-          name,
-          description,
-          url
-        },
-        rating{
-          ratingValue,
-          bestRating,
-          worstRating
+      _type == "block" => {
+        ...,
+        markDefs[]{
+          ...,
+          _type == "link" => { _type, href, blank }
         }
       }
-    }
-  `
-  // ✅ CONFIGURACIÓN DE CACHE EXPLÍCITA
-  return await client.fetch(query, { slug }, {
-    next: { revalidate: 3600 } // Cache por 1 hora
-  })
-}
-
-// ✅ FUNCIÓN CORREGIDA - CON CONFIGURACIÓN DE CACHE EXPLÍCITA
-async function getRecommendedTours() {
-  const query = `
-    *[_type == "post"] | order(_createdAt desc)[0...60]{
-      _id,
+    },
+    pageType,
+    heroImage{
+      asset->{ _id, url },
+      alt,
+      heading
+    },
+    heroContent{
+      heroTitle,
+      heroSubtitle,
+      excerpt,
+      customText
+    },
+    highlights[]{
       title,
-      slug,
-      mainImage{
-        asset->{
-          url
-        },
-        alt
-      },
-      heroGallery[]{
-        asset->{
-          url
-        },
-        alt
-      },
-      body
+      description,
+      icon
+    },
+    pageSettings{
+      showRecommendedTours,
+      backgroundColor,
+      ctaText,
+      ctaUrl
+    },
+    sidebarWidget{
+      showWidget,
+      ctaTitle,
+      ctaDescription,
+      ctaButtonText,
+      ctaButtonUrl,
+      widgetImage{ asset->{ _id, url }, alt },
+      quickLinks[]{ title, url, icon }
+    },
+    seoTitle,
+    seoDescription,
+    seoKeywords,
+    seoImage{ asset->{ _id, url }, alt },
+    publishedAt,
+    _updatedAt,
+    seo{ metaTitle, metaDescription },
+    richSnippets{
+      schemaType,
+      readingTime,
+      wordCount,
+      difficulty,
+      estimatedCost{ currency, minValue, maxValue },
+      timeRequired,
+      about{ name, type },
+      steps[]{ name, text, url },
+      faqItems[]{ question, answer },
+      itemList[]{ name, description, url },
+      rating{ ratingValue, bestRating, worstRating }
     }
-  `
-  // ✅ CONFIGURACIÓN DE CACHE EXPLÍCITA
-  return await client.fetch(query, {}, {
-    next: { revalidate: 1800 } // Cache por 30 minutos
-  })
+  }`;
+
+  return await client.fetch(query, { slug }, cacheConfig);
 }
 
-// ✅ GENERATEMETADATA con params async - Next.js 15
-export async function generateMetadata(
-  { params }: { params: Promise<{ slug: string }> }
-): Promise<Metadata> {
-  const { slug } = await params
-  
-  const page = await getPage(slug)
-  if (!page) {
-    return {
-      title: 'Page Not Found | ',
-      description: 'This page doesn\'t exist.'
-    }
-  }
-
-  const baseUrl = 'https://.com'
-  const canonical = `${baseUrl}/${slug}`
-  
-  // SEO data con fallbacks
-  const title = page.seoTitle || page.seo?.metaTitle || `${page.title} | ScootersTour`
-  const description = page.seoDescription || page.seo?.metaDescription || 
-    page.heroContent?.excerpt || `Learn more about ${page.title} at ScootersTour`
-  const keywords = page.seoKeywords || [page.title.toLowerCase(), 'ScootersTour', 'rome tours']
-
-  // 🚀 IMAGEN SOCIAL OPTIMIZADA
-  const socialImage = page.seoImage 
-    ? urlFor(page.seoImage).width(1200).height(630).format('webp').quality(85).url()
-    : page.heroImage 
-    ? urlFor(page.heroImage).width(1200).height(630).format('webp').quality(85).url()
-    : `${baseUrl}/images/default-page.jpg`
-
-  return {
+// QUERY: POSTS POR CATEGORÍA
+async function getPostsByCategory(categorySlug: string) {
+  const query = `*[_type == "post" && category->slug.current == $categorySlug]| order(_createdAt desc)[0...200]{
     title,
-    description,
-    keywords,
-    authors: [{ name: 'ScootersTour' }],
-    creator: 'ScootersTour',
-    publisher: 'ScootersTour',
-    
-    openGraph: {
-      type: 'website',
-      locale: 'en_US',
-      url: canonical,
-      title,
-      description,
-      siteName: 'ScootersTour',
-      images: [
-        {
-          url: socialImage,
-          width: 1200,
-          height: 630,
-          alt: page.seoImage?.alt || page.heroImage?.alt || title,
-        },
-      ],
-    },
-    
-    twitter: {
-      card: 'summary_large_image',
-      title,
-      description,
-      images: [socialImage],
-    },
-    
-    alternates: {
-      canonical,
-      languages: {
-        'en': canonical,
-      },
-    },
-    
-    robots: {
-      index: true,
-      follow: true,
-      googleBot: {
-        index: true,
-        follow: true,
-      },
-    },
-    
-    verification: {
-      google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION
-    }
-  }
+    slug,
+    seoDescription,
+    seoImage { asset-> { url }, alt },
+    heroGallery[] { asset-> { url }, alt },
+    tourInfo{ duration, price, currency },
+    tourFeatures{ skipTheLine, smallGroupAvailable, freeCancellation },
+    getYourGuideData{ rating, reviewCount },
+    "categoryTitle": category->title
+  }`;
+
+  return await client.fetch(query, { categorySlug }, cacheConfig);
 }
 
-// ✅ Componente principal Server Component
-export default async function StaticPage({ params }: { params: Promise<{ slug: string }> }) {
-  const { slug } = await params
+// QUERY: TOURS RECOMENDADOS
+async function getRecommendedTours() {
+  const query = `*[_type == "post"] | order(_createdAt desc)[0...60] {
+    _id, title, slug,
+    mainImage { asset-> { url }, alt },
+    heroGallery[] { asset-> { url }, alt },
+    body
+  }`;
 
-  const page = await getPage(slug)
-  if (!page) {
-    notFound()
+  return await client.fetch(query, {}, {
+    next: { revalidate: 1800 }
+  });
+}
+
+// QUERY: TOURS RELACIONADOS
+async function getRelatedTours(currentSlug: string) {
+  const query = `*[_type == "post" && slug.current != $currentSlug][0...3]{
+    _id, title, slug,
+    mainImage{ asset->{ url }, alt },
+    heroGallery[]{ asset->{ url }, alt },
+    body
+  }`;
+
+  return await client.fetch(query, { currentSlug }, cacheConfig);
+}
+
+// ========================================
+// METADATA GENERATOR
+// ========================================
+export async function generateMetadata({ 
+  params 
+}: { 
+  params: Promise<{ slug: string }> 
+}): Promise<Metadata> {
+  const { slug } = await params;
+
+  // 🔍 Buscar en paralelo (prioridad: categoría > tour > page)
+  const [category, tour, page] = await Promise.all([
+    getCategory(slug),
+    getTour(slug),
+    getPage(slug)
+  ]);
+
+  // METADATA: CATEGORÍA
+  if (category) {
+    const canonical = `${SITE_URL}/${category.slug.current}`;
+    const title = category.seoTitle || category.metaTitle || `${category.title} Tours | ${SITE_NAME}`;
+    const description = category.seoDescription || category.metaDescription || category.description || `Discover amazing ${category.title} tours`;
+    const keywords = category.seoKeywords || [category.title.toLowerCase(), 'tours'];
+
+    const socialImage = category.seoImage?.asset?.url
+      ? urlFor(category.seoImage).width(1200).height(630).format('webp').quality(85).url()
+      : category.image?.asset?.url
+        ? urlFor(category.image).width(1200).height(630).format('webp').quality(85).url()
+        : `${SITE_URL}/images/default-category.jpg`;
+
+    return {
+      title,
+      description,
+      keywords,
+      authors: [{ name: SITE_NAME }],
+      openGraph: {
+        type: 'website',
+        url: canonical,
+        title,
+        description,
+        siteName: SITE_NAME,
+        images: [{ url: socialImage, width: 1200, height: 630 }],
+      },
+      twitter: {
+        card: 'summary_large_image',
+        title,
+        description,
+        images: [socialImage],
+      },
+      alternates: { canonical },
+      robots: { index: true, follow: true },
+    };
   }
 
-  // Obtener tours recomendados si están habilitados
-  const recommendedTours = page.pageSettings?.showRecommendedTours 
-    ? await getRecommendedTours() 
-    : []
+  // METADATA: TOUR
+  if (tour) {
+    const canonical = `${SITE_URL}/${tour.slug.current}`;
+    const title = tour.seoTitle || tour.title;
+    const description = tour.seoDescription || `Discover ${tour.title}`;
+    const socialImage = tour.seoImage 
+      ? urlFor(tour.seoImage).width(1200).height(630).url()
+      : `${SITE_URL}/images/default-social.jpg`;
 
-  // Pasar datos al Client Component
-  return <StaticPageClient page={page} slug={slug} recommendedTours={recommendedTours} />
+    return {
+      title,
+      description,
+      keywords: tour.seoKeywords || [],
+      authors: [{ name: SITE_NAME }],
+      openGraph: {
+        type: 'website',
+        url: canonical,
+        title,
+        description,
+        siteName: SITE_NAME,
+        images: [{ url: socialImage, width: 1200, height: 630 }],
+      },
+      twitter: {
+        card: 'summary_large_image',
+        title,
+        description,
+        images: [socialImage],
+      },
+      alternates: { canonical },
+      robots: { index: true, follow: true },
+    };
+  }
+
+  // METADATA: PAGE
+  if (page) {
+    const canonical = `${SITE_URL}/${page.slug.current}`;
+    const title = page.seoTitle || page.seo?.metaTitle || `${page.title} | ${SITE_NAME}`;
+    const description = page.seoDescription || page.seo?.metaDescription || 
+      page.heroContent?.excerpt || `Learn more about ${page.title}`;
+    const keywords = page.seoKeywords || [page.title.toLowerCase(), SITE_NAME.toLowerCase()];
+
+    const socialImage = page.seoImage 
+      ? urlFor(page.seoImage).width(1200).height(630).format('webp').quality(85).url()
+      : page.heroImage 
+        ? urlFor(page.heroImage).width(1200).height(630).format('webp').quality(85).url()
+        : `${SITE_URL}/images/default-page.jpg`;
+
+    return {
+      title,
+      description,
+      keywords,
+      authors: [{ name: SITE_NAME }],
+      openGraph: {
+        type: 'website',
+        url: canonical,
+        title,
+        description,
+        siteName: SITE_NAME,
+        images: [{ url: socialImage, width: 1200, height: 630 }],
+      },
+      twitter: {
+        card: 'summary_large_image',
+        title,
+        description,
+        images: [socialImage],
+      },
+      alternates: { canonical },
+      robots: { index: true, follow: true },
+    };
+  }
+
+  // NO ENCONTRADO
+  return {
+    title: 'Page Not Found',
+    description: 'This page doesn\'t exist.'
+  };
+}
+
+// ========================================
+// COMPONENTE PRINCIPAL
+// ========================================
+export default async function UnifiedPage({ 
+  params 
+}: { 
+  params: Promise<{ slug: string }> 
+}) {
+  const { slug } = await params;
+
+  // 🔍 Buscar en paralelo (OPTIMIZADO)
+  // Prioridad: categoría > tour > page
+  const [category, tour, page] = await Promise.all([
+    getCategory(slug),
+    getTour(slug),
+    getPage(slug)
+  ]);
+
+  // ========================================
+  // CASO 1: ES UNA CATEGORÍA (prioridad más alta)
+  // ========================================
+  if (category) {
+    const posts = await getPostsByCategory(slug);
+    const recommendedTours = await getRecommendedTours();
+
+    return (
+      <CategoryPageClient 
+        category={category}
+        posts={posts}
+        recommendedTours={recommendedTours}
+      />
+    );
+  }
+
+  // ========================================
+  // CASO 2: ES UN TOUR
+  // ========================================
+  if (tour) {
+    const relatedPosts = await getRelatedTours(slug);
+    const recommendedPosts = await getRecommendedTours();
+
+    return (
+      <TourPageClient 
+        post={tour}
+        relatedPosts={relatedPosts}
+        recommendedPosts={recommendedPosts}
+      />
+    );
+  }
+
+  // ========================================
+  // CASO 3: ES UNA PAGE (artículo/institucional)
+  // ========================================
+  if (page) {
+    const recommendedTours = page.pageSettings?.showRecommendedTours 
+      ? await getRecommendedTours() 
+      : [];
+
+    return (
+      <StaticPageClient 
+        page={page} 
+        slug={slug} 
+        recommendedTours={recommendedTours} 
+      />
+    );
+  }
+
+  // ========================================
+  // CASO 4: NO ENCONTRADO
+  // ========================================
+  notFound();
 }
