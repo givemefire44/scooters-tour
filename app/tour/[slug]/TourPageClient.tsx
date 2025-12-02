@@ -259,7 +259,7 @@ export default function TourPageClient({
       )}
 
       {/* 🏢 PROVIDER */}
-      {post.getYourGuideData?.provider && (
+      {(post.getYourGuideData as any)?.provider && (
         <div className="desktop-detail-item">
           <div className="desktop-detail-icon">🏢</div>
           <div className="desktop-detail-content">

@@ -340,12 +340,12 @@ export default function MobileTourPage({ post, recommendedTours }: MobileTourPag
 )}
 
 {/* 🏢 PROVIDER - AGREGADO */}
-{post.getYourGuideData?.provider && (
+{(post.getYourGuideData as any)?.provider && (
   <div className="detail-item">
     <div className="detail-icon">🏢</div>
     <div className="detail-content">
       <div className="detail-label">Provider</div>
-      <div className="detail-value">{post.getYourGuideData.provider}</div>
+      <div className="detail-value">{(post.getYourGuideData as any).provider}</div>
     </div>
   </div>
 )}
