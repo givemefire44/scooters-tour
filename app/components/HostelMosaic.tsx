@@ -1,10 +1,13 @@
 'use client';
 
-import React, { useState, useEffect } from "react";
+import React from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { client } from "@/sanity/lib/client";
 import { urlFor } from "@/sanity/lib/image";
+
+interface HostelMosaicProps {
+  cards?: any[];
+}
 
 function getCardClass(i: number) {
   let classes = "hostel-mosaic-card";
@@ -21,73 +24,19 @@ function getCardStyle(i: number) {
   };
 }
 
-export default function HostelMosaic() {
-  const [hostels, setHostels] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    async function fetchMosaicData() {
-      try {
-        console.log('🔥 Cargando datos del mosaic desde Sanity...');
-        
-        const query = `*[_type == "mosaicCard" && active == true] | order(order asc) {
-          name,
-          location,
-          image,
-          url,
-          order
-        }`;
-        
-        const sanityData = await client.fetch(query, {}, {
-          next: { revalidate: 3600 }
-        });
-        
-        if (sanityData && sanityData.length > 0) {
-          const convertedData = sanityData.map(item => ({
-            name: item.name,
-            location: item.location || '',
-            img: urlFor(item.image).width(400).height(300).format('webp').quality(85).url(),
-            url: item.url || '#'
-          }));
-          
-          setHostels(convertedData);
-          console.log('✅ Datos cargados desde Sanity:', convertedData.length, 'items');
-        }
-      } catch (error) {
-        console.error('❌ Error cargando datos del mosaic:', error);
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    fetchMosaicData();
-  }, []);
-
-  // Si está cargando, mostrar loading
-  if (loading) {
-    return (
-      <div className="hostel-mosaic-section">
-        <div className="hostel-mosaic-container">
-          <div className="hostel-mosaic-info">
-            <h2>
-              <span className="highlight">Unforgettable tours on two wheels, feel the wind, live the adventure.</span>
-            </h2>
-            <div className="hostel-mosaic-info-description">
-              Don't forget book your Scooter Tour in Advance!
-            </div>
-          </div>
-          <div style={{ padding: '40px', textAlign: 'center', color: '#666' }}>
-            Cargando tours...
-          </div>
-        </div>
-      </div>
-    );
-  }
-
+export default function HostelMosaic({ cards = [] }: HostelMosaicProps) {
   // Si no hay datos, no mostrar nada
-  if (hostels.length === 0) {
+  if (!cards || cards.length === 0) {
     return null;
   }
+
+  // Convertir datos de Sanity a formato del componente
+  const hostels = cards.map(item => ({
+    name: item.name,
+    location: item.location || '',
+    img: urlFor(item.image).width(400).height(300).format('webp').quality(85).url(),
+    url: item.url || '#'
+  }));
 
   return (
     <div className="hostel-mosaic-section">
@@ -97,7 +46,7 @@ export default function HostelMosaic() {
             <span className="highlight">Unforgettable tours on two wheels, feel the wind, live the adventure.</span>
           </h2>
           <div className="hostel-mosaic-info-description">
-          Don't forget book your Scooter Tour in Advance!
+            Don't forget book your Scooter Tour in Advance!
           </div>
         </div>
         <div className="hostel-mosaic-list">

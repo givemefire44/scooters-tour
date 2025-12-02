@@ -1,65 +1,26 @@
 'use client';
 
-import React, { useState, useEffect } from "react";
+import React from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { client } from "@/sanity/lib/client";
 import { urlFor } from "@/sanity/lib/image";
 
-export default function LugaresPopularesArg() {
-  const [lugares, setLugares] = useState([]);
-  const [loading, setLoading] = useState(true);
+interface LugaresPopularesArgProps {
+  destinations?: any[];
+}
 
-  useEffect(() => {
-    async function fetchDestinationData() {
-      try {
-        console.log('🔥 Cargando destinos desde Sanity...');
-        
-        const query = `*[_type == "destinationCard" && active == true] | order(order asc) {
-          nombre,
-          image,
-          url,
-          order
-        }`;
-        
-        const sanityData = await client.fetch(query, {}, {
-          next: { revalidate: 3600 }
-        });
-        
-        if (sanityData && sanityData.length > 0) {
-          const convertedData = sanityData.map(item => ({
-            nombre: item.nombre,
-            img: urlFor(item.image).width(400).height(300).format('webp').quality(85).url(),
-            url: item.url || '#'
-          }));
-          
-          setLugares(convertedData);
-          console.log('✅ Destinos cargados desde Sanity:', convertedData.length, 'items');
-        }
-      } catch (error) {
-        console.error('❌ Error cargando destinos desde Sanity:', error);
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    fetchDestinationData();
-  }, []);
-
+export default function LugaresPopularesArg({ destinations = [] }: LugaresPopularesArgProps) {
   // Si no hay datos, no renderizar nada
-  if (loading) {
-    return (
-      <section className="lugares-populares">
-        <div style={{ padding: '40px', textAlign: 'center', color: '#666' }}>
-          Cargando destinos...
-        </div>
-      </section>
-    );
+  if (!destinations || destinations.length === 0) {
+    return null;
   }
 
-  if (lugares.length === 0) {
-    return null; // No renderizar si no hay datos
-  }
+  // Convertir datos de Sanity a formato del componente
+  const lugares = destinations.map(item => ({
+    nombre: item.nombre,
+    img: urlFor(item.image).width(400).height(300).format('webp').quality(85).url(),
+    url: item.url || '#'
+  }));
 
   return (
     <section className="lugares-populares">

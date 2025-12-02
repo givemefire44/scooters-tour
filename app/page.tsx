@@ -374,8 +374,8 @@ export default async function HomePage() {
       
       {/* Above the fold - Datos pre-cargados */}
       <Container>
-        <HostelGrid />
-      </Container>
+  <HostelGrid cards={mosaicData} />
+</Container>
       
    
       
@@ -386,9 +386,8 @@ export default async function HomePage() {
       {/* </Suspense> */}
       
       <Container>
-        <LugaresPopularesArg />
-      </Container>
-
+  <LugaresPopularesArg destinations={destinations} />
+</Container>
       <Container>
         <RecommendedTours tours={tours} />
       </Container>
