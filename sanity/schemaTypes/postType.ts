@@ -21,9 +21,9 @@ export const postType = defineType({
         
         if (filename) {
           return filename
-            .replace(/\.[^/.]+$/, '')      // Quita extensión
-            .replace(/[-_]/g, ' ')        // - y _ → espacios
-            .replace(/\w\S*/g, (txt) =>   // Capitaliza palabras
+            .replace(/\.[^/.]+$/, '')
+            .replace(/[-_]/g, ' ')
+            .replace(/\w\S*/g, (txt) =>
               txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase()
             );
         }
@@ -41,7 +41,7 @@ export const postType = defineType({
       validation: Rule => Rule.required()
     }),
     defineField({
-      name: 'categories', // ← Cambio a plural
+      name: 'categories',
       type: 'array',
       title: 'Categorías/Destinos',
       description: 'Selecciona todos los destinos donde aparecerá este tour (ej: Florence, Tuscany, Chianti)',
@@ -53,6 +53,7 @@ export const postType = defineType({
       ],
       validation: Rule => Rule.min(1).max(5).required().error('Mínimo 1 categoría, máximo 5')
     }),
+    
     // ========================================
     // SECCIÓN SEO
     // ========================================
@@ -194,7 +195,6 @@ export const postType = defineType({
           title: 'Ubicación',
           description: 'Ciudad/lugar principal del tour'
         }),
-        // ✅ CAMBIO 1: provider → platform
         defineField({
           name: 'platform',
           type: 'string',
@@ -285,34 +285,28 @@ export const postType = defineType({
       description: 'URL completa del tour en GetYourGuide para referencia'
     }),
 
-    // 🆕 NUEVO: RATING Y REVIEWS DE GETYOURGUIDE
+    // ========================================
+    // GETYOURGUIDE DATA
+    // ========================================
     defineField({
       name: 'getYourGuideData',
       type: 'object',
-      title: '⭐ GetYourGuide Review Data',
-      description: '⚠️ Update manually from GetYourGuide product page (check monthly). Copy rating and review count.',
-      options: {
-        collapsible: true,
-        collapsed: false
-      },
+      title: 'GetYourGuide Data 📊',
+      description: 'Rating, reviews, and provider info from GetYourGuide',
       fields: [
         defineField({
           name: 'rating',
           type: 'number',
           title: 'Rating ⭐',
-          description: 'Current rating from GetYourGuide (e.g., 4.5)',
-          validation: Rule => Rule.min(0).max(5).precision(1),
-          placeholder: '4.5'
+          description: 'Average rating from GetYourGuide (1-5)',
+          validation: Rule => Rule.min(1).max(5)
         }),
         defineField({
           name: 'reviewCount',
           type: 'number',
-          title: 'Total Reviews',
-          description: 'Total number of reviews on GetYourGuide (e.g., 1335)',
-          validation: Rule => Rule.min(0).integer(),
-          placeholder: '1335'
+          title: 'Review Count 💬',
+          description: 'Total number of reviews on GetYourGuide'
         }),
-        // ✅ CAMBIO 2: NUEVO CAMPO provider
         defineField({
           name: 'provider',
           type: 'string',
@@ -328,6 +322,10 @@ export const postType = defineType({
           initialValue: () => new Date().toISOString()
         })
       ],
+      options: {
+        collapsible: true,
+        collapsed: false
+      },
       preview: {
         select: {
           rating: 'rating',
