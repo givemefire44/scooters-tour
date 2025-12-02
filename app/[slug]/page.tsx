@@ -449,7 +449,7 @@ export default async function UnifiedPage({
   // ========================================
   if (category) {
     const posts = await getPostsByCategory(slug);
-    const recommendedTours = await getRecommendedTours(slug);
+    const recommendedTours = await getRecommendedTours();
 
     return (
       <CategoryPageClient 
