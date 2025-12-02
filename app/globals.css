@@ -78,6 +78,7 @@ body {
 /* RESPONSIVE PARA TÍTULOS */
 @media (max-width: 768px) {
   .hero-section {
+    background-image: url('/images/vespa-verona-mobile.jpg');
     padding: 12px 0 18px 0;
   }
   .hero-title {
