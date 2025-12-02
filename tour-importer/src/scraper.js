@@ -126,17 +126,62 @@ export async function scrapeGetYourGuideTour(url) {
     });
     
     await randomDelay(1000, 2000);
-    
-    // Click en "Show more" si existe
+
+    // 🖼️ ABRIR GALERÍA LIGHTBOX - CRUCIAL PARA OBTENER IMÁGENES
+console.log('🖼️ Intentando abrir galería de imágenes...');
+try {
+  // Buscar y hacer click en la imagen principal para abrir lightbox
+  const mainImageSelectors = [
+    'img.c-image__img',
+    '[class*="hero"] img',
+    '[class*="main-image"] img',
+    'img[alt*="image n.1"]',
+  ];
+  
+  let galleryOpened = false;
+  
+  for (const selector of mainImageSelectors) {
     try {
-      const showMoreButton = await page.$('[data-test-id="activity-description-read-more-button"]');
-      if (showMoreButton) {
-        console.log('📖 Expandiendo descripción completa...');
-        await showMoreButton.click();
-        await randomDelay(1000, 2000);
+      const mainImage = await page.$(selector);
+      if (mainImage) {
+        console.log(`   Haciendo click en imagen: ${selector}`);
+        await mainImage.click();
+        await randomDelay(2000, 3000); // Esperar a que abra el modal
+        
+        // Verificar si se abrió el lightbox
+        const lightbox = await page.$('[class*="lightbox"], [class*="swiper"]');
+        if (lightbox) {
+          console.log('   ✅ Lightbox de galería abierto');
+          galleryOpened = true;
+          break;
+        }
       }
     } catch (e) {
-      console.log('ℹ️ No se encontró botón "Show more"');
+      // Probar siguiente selector
+    }
+  }
+  
+  if (!galleryOpened) {
+    console.log('   ⚠️ No se pudo abrir galería, usando imágenes de página principal');
+  }
+} catch (e) {
+  console.log('   ⚠️ Error abriendo galería:', e.message);
+}
+    
+    // Click en "Show more" si existe (para expandir descripción completa)
+    try {
+      const showMoreButtons = await page.$$('button.toggle-content__button, button.toggle-content__label');
+      for (const button of showMoreButtons) {
+        try {
+          await button.click();
+          await randomDelay(500, 1000);
+        } catch (e) {
+          // Ignorar si el botón no es clickeable
+        }
+      }
+      console.log('📖 Contenido expandido');
+    } catch (e) {
+      console.log('ℹ️ No se encontraron botones para expandir');
     }
     
     // Extraer todos los datos
@@ -160,151 +205,156 @@ export async function scrapeGetYourGuideTour(url) {
       let rating = 0;
       let reviewCount = 0;
       
-      const ratingText = document.body.innerText;
-      const ratingMatch = ratingText.match(/(\d+\.?\d*)\s*out of 5/i);
+      const bodyText = document.body.innerText;
+      const ratingMatch = bodyText.match(/(\d+\.?\d*)\s*out of 5/i);
       if (ratingMatch) rating = parseFloat(ratingMatch[1]);
       
-      const reviewMatch = ratingText.match(/(\d+[\d,]*)\s*reviews/i);
+      const reviewMatch = bodyText.match(/(\d+[\d,]*)\s*reviews/i);
       if (reviewMatch) reviewCount = parseInt(reviewMatch[1].replace(/,/g, ''));
       
-      // Extraer precio
-      let price = 0;
-      const priceElements = document.querySelectorAll('[class*="price"], [data-test-id*="price"]');
-      for (const el of priceElements) {
-        const priceText = el.innerText;
-        const priceMatch = priceText.match(/\$(\d+[\d,]*)/);
-        if (priceMatch) {
-          price = parseFloat(priceMatch[1].replace(/,/g, ''));
-          break;
-        }
-      }
+// Extraer precio
+let price = 0;
+
+// 1️⃣ PRIORIDAD: Precio con descuento (--label-discounted)
+const discountedPrice = document.querySelector('[style*="--label-discounted"]');
+if (discountedPrice) {
+  const priceText = discountedPrice.innerText;
+  const priceMatch = priceText.match(/\$(\d+[\d,]*)/);
+  if (priceMatch) {
+    price = parseFloat(priceMatch[1].replace(/,/g, ''));
+  }
+}
+
+// 2️⃣ FALLBACK: Si no hay descuento, buscar precio normal
+if (price === 0) {
+  const priceElements = document.querySelectorAll('[class*="price"], [data-test-id*="price"]');
+  for (const el of priceElements) {
+    // ❌ IGNORAR precios dentro de <del> o con "From"
+    if (el.closest('del') || el.closest('.price-info__from-base-price')) {
+      continue;
+    }
+    
+    const priceText = el.innerText;
+    const priceMatch = priceText.match(/\$(\d+[\d,]*)/);
+    if (priceMatch) {
+      price = parseFloat(priceMatch[1].replace(/,/g, ''));
+      break;
+    }
+  }
+}
       
       // Extraer duración
       let duration = '';
-      const durationElements = document.querySelectorAll('[class*="duration"]');
-      for (const el of durationElements) {
-        if (el.innerText.includes('hour') || el.innerText.includes('minute')) {
-          duration = el.innerText.trim();
-          break;
+      const durationMeta = document.querySelector('meta[property="product:duration"]') ||
+                           document.querySelector('meta[itemprop="duration"]');
+      if (durationMeta) {
+        duration = durationMeta.content;
+      }
+      
+      if (!duration) {
+        const durationMatch = bodyText.match(/Duration[:\s]+(\d+\.?\d*(?:\s*-\s*\d+\.?\d*)?\s*hours?)/i);
+        if (durationMatch) {
+          duration = durationMatch[1].trim();
         }
       }
       
-      // Extraer descripción completa
-      const descriptionElement = document.querySelector('[data-test-id="activity-description"]') ||
-                                 document.querySelector('[class*="description"]');
-      const description = descriptionElement ? descriptionElement.innerText.trim() : '';
+      // Extraer descripción - SELECTOR EXACTO
+      const description = getText('[data-test-id="single-text"]');
       
-      // Extraer highlights
-      const highlights = getTextAll('[data-test-id="activity-highlight"]');
+// Extraer highlights - SELECTOR EXACTO (solo del bloque highlights-point)
+const highlights = Array.from(document.querySelectorAll('#highlights-point [data-test-id="text-list-block-list"] li'))
+  .map(li => li.innerText.trim())
+  .filter(text => text.length > 0);
       
-      // Extraer includes
-      let includes = [];
-      const includesHeading = Array.from(document.querySelectorAll('h2, h3, strong'))
-        .find(el => el.innerText.toLowerCase().includes('include'));
-      if (includesHeading) {
-        const parent = includesHeading.closest('section') || includesHeading.parentElement;
-        const listItems = parent.querySelectorAll('li');
-        includes = Array.from(listItems).map(li => li.innerText.trim());
-      }
+      // Extraer includes - SELECTOR EXACTO
+      const includes = Array.from(document.querySelectorAll('[id^="inclusion-"][id$="-title-text"]'))
+        .map(el => el.innerText.trim())
+        .filter(text => text.length > 0);
       
-      // Extraer idiomas (CORREGIDO)
+      // Extraer idiomas
       let languages = 'English';
       try {
-        const languageText = document.body.innerText;
-        const langMatch = languageText.match(/(?:Languages?|Live tour guide|Guide)(?::|\s)+([A-Z][a-z]+(?:,\s*[A-Z][a-z]+)*)/i);
+        const langMatch = bodyText.match(/(?:Languages?|Live tour guide|Guide)(?::|\s)+([A-Z][a-z]+(?:,\s*[A-Z][a-z]+)*)/i);
         if (langMatch) {
           languages = langMatch[1].trim();
         }
       } catch (e) {
         languages = 'English';
       }
+
+      // Extraer provider - SELECTOR EXACTO
+     const provider = getText('[id="activity-provider-description-title"]').replace('Activity provider: ', '').trim();
       
-      // 🔥 EXTRACCIÓN MEJORADA DE IMÁGENES - CON FILTROS INTELIGENTES
-      const images = [];
-      const processedUrls = new Set();
+// 🔥 EXTRACCIÓN DE IMÁGENES - DESDE LIGHTBOX/GALERÍA
+const images = [];
+const processedUrls = new Set();
+
+// 🎯 PRIORIDAD 1: Buscar en el lightbox/swiper (galería abierta)
+const lightboxImages = document.querySelectorAll(
+  '.media-lightbox-swiper-embed img, ' +
+  '.swiper-slide img, ' +
+  '[class*="lightbox"] img'
+);
+
+console.log(`📸 Imágenes en lightbox: ${lightboxImages.length}`);
+
+// Si encontró imágenes en el lightbox, usarlas
+const imagesToProcess = lightboxImages.length > 0 
+  ? lightboxImages 
+  : document.querySelectorAll('img[src*="tour_img"], img[srcset*="tour_img"]');
+
+console.log(`📸 Procesando ${imagesToProcess.length} imágenes`);
+
+for (const img of Array.from(imagesToProcess).slice(0, 15)) {
+  let imageUrl = null;
+  
+  // 🎯 PRIORIDAD 1: Buscar en srcset (versiones grandes)
+  if (img.srcset && img.srcset.includes('tour_img')) {
+    const srcsetParts = img.srcset.match(/(https:\/\/[^\s]+)\s+\d+x/gi);
+    if (srcsetParts && srcsetParts.length > 0) {
+      // Tomar la última (mayor resolución: dpr=2)
+      imageUrl = srcsetParts[srcsetParts.length - 1].replace(/\s+\d+x$/i, '');
+    }
+  }
+  
+  // FALLBACK: src normal
+  if (!imageUrl) {
+    imageUrl = img.src || img.dataset.src || img.dataset.lazySrc;
+  }
+  
+  if (!imageUrl || !imageUrl.includes('tour_img')) continue;
+  
+  // ✅ Usar URL completa sin modificar
+  if (!processedUrls.has(imageUrl)) {
+    processedUrls.add(imageUrl);
+    images.push({
+      url: imageUrl,
+      baseUrl: imageUrl,
+      width: img.naturalWidth || 0,
+      height: img.naturalHeight || 0
+    });
+  }
+}
+
+// Filtrado final
+const filteredImages = images
+  .filter(img => {
+    if (img.width > 0 && img.height > 0) {
+      if (img.width < 400) return false;
+      return true;
+    }
+    return true;
+  })
+  .slice(0, 6)
+  .map(img => img.url);
+
+console.log(`✅ Imágenes seleccionadas: ${filteredImages.length}`);
       
-      // Estrategia 1: Buscar galería de imágenes
-      const galleryImages = document.querySelectorAll('[class*="gallery"] img, [class*="Gallery"] img, [data-test-id*="image"] img');
-      
-      console.log(`📸 Encontradas ${galleryImages.length} imágenes candidatas en galería`);
-      
-      for (const img of galleryImages) {
-        let imageUrl = img.src || img.dataset.src || img.dataset.lazySrc;
-        
-        if (imageUrl && imageUrl.includes('getyourguide')) {
-          const baseUrl = imageUrl.split('?')[0];
-          
-          // ✅ Tamaño óptimo: 1600px (sweet spot calidad/disponibilidad)
-          const optimizedUrl = `${baseUrl}?w=1600&q=90`;
-          
-          if (!processedUrls.has(baseUrl)) {
-            processedUrls.add(baseUrl);
-            images.push({
-              url: optimizedUrl,
-              baseUrl: baseUrl,
-              width: img.naturalWidth || 0,
-              height: img.naturalHeight || 0
-            });
-          }
-        }
-      }
-      
-      // Estrategia 2: Si no hay suficientes, buscar en srcset
-      if (images.length < 8) {
-        const allImages = document.querySelectorAll('img[srcset]');
-        for (const img of allImages) {
-          const srcset = img.srcset;
-          if (srcset && srcset.includes('getyourguide')) {
-            const urls = srcset.split(',').map(s => s.trim().split(' ')[0]);
-            const baseUrl = urls[urls.length - 1].split('?')[0];
-            
-            if (!processedUrls.has(baseUrl)) {
-              processedUrls.add(baseUrl);
-              images.push({
-                url: `${baseUrl}?w=1600&q=90`,
-                baseUrl: baseUrl,
-                width: img.naturalWidth || 0,
-                height: img.naturalHeight || 0
-              });
-            }
-          }
-          
-          if (images.length >= 10) break;
-        }
-      }
-      
-      // 🔥 FILTRADO INTELIGENTE - Priorizar mejores imágenes
-      const filteredImages = images
-        .filter(img => {
-          // Si tenemos dimensiones, filtrar
-          if (img.width > 0 && img.height > 0) {
-            // Mínimo 600px de ancho (flexible)
-            if (img.width < 600) return false;
-            
-            // Evitar imágenes muy verticales (portraits extremos)
-            const aspectRatio = img.width / img.height;
-            if (aspectRatio < 0.6) return false; // Muy vertical
-            
-            return true;
-          }
-          // Si no hay dimensiones, aceptar (verificaremos después)
-          return true;
-        })
-        .slice(0, 6) // Tomar 6 mejores para tener margen
-        .map(img => img.url);
-      
-      console.log(`✅ Imágenes tras filtrado: ${filteredImages.length} de ${images.length} candidatas`);
-      
-      // Extraer reviews (quotes)
-      const reviewQuotes = [];
-      const reviewElements = document.querySelectorAll('[data-test-id*="review"]');
-      for (const el of reviewElements) {
-        const text = el.innerText.trim();
-        if (text.length > 20 && text.length < 200) {
-          reviewQuotes.push(text);
-        }
-        if (reviewQuotes.length >= 3) break;
-      }
+      // Extraer reviews - SELECTOR EXACTO
+      const reviewQuotes = Array.from(document.querySelectorAll('.review-highlight-card__text'))
+        .map(p => p.innerText.trim())
+        .filter(text => text.length > 20)
+        .slice(0, 5);
       
       // Detectar features
       const fullText = document.body.innerText.toLowerCase();
@@ -326,7 +376,8 @@ export async function scrapeGetYourGuideTour(url) {
         highlights,
         includes,
         languages,
-        images: filteredImages, // ✅ Usar imágenes filtradas
+        provider,  // ← NUEVO
+        images: filteredImages,
         reviewQuotes,
         features,
         url: window.location.href
@@ -338,8 +389,12 @@ export async function scrapeGetYourGuideTour(url) {
     console.log(`   Rating: ${tourData.rating}★ (${tourData.reviewCount} reviews)`);
     console.log(`   Precio: $${tourData.price}`);
     console.log(`   Duración: ${tourData.duration}`);
+    console.log(`   Descripción: ${tourData.description.substring(0, 100)}...`);
+    console.log(`   Highlights: ${tourData.highlights.length} items`);
+    console.log(`   Includes: ${tourData.includes.length} items`);
+    console.log(`   Reviews: ${tourData.reviewQuotes.length} items`);
     console.log(`   Idiomas: ${tourData.languages}`);
-    console.log(`   Imágenes encontradas: ${tourData.images.length}`);
+    console.log(`   Imágenes: ${tourData.images.length}`);
     
     return tourData;
     

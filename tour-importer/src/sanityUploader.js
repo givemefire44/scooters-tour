@@ -142,6 +142,8 @@ export async function createTourPost(tourData, generatedContent, uploadedImages)
   try {
     // Generar slug
     const slug = generateSlug(generatedContent.title);
+
+
     
     // Convertir contenido a Portable Text
     const portableTextBody = markdownToPortableText(generatedContent.body);
@@ -189,7 +191,7 @@ export async function createTourPost(tourData, generatedContent, uploadedImages)
         price: tourData.price || 0,
         currency: 'USD',
         location: generatedContent.city,
-        provider: 'scooterstour.com'
+        platform: 'scooterstour.com'  // ← CORRECTO
       },
       
       // Tour Features
@@ -208,6 +210,7 @@ export async function createTourPost(tourData, generatedContent, uploadedImages)
         _type: 'object',
         rating: tourData.rating || 0,
         reviewCount: tourData.reviewCount || 0,
+        provider: tourData.provider || '',  // ← AGREGAR
         lastUpdated: new Date().toISOString()
       },
       

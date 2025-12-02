@@ -63,23 +63,6 @@ export const postTemplate = {
  ### 👉 Recommended for
  
  [Audiencias ideales con razones específicas]
- 
- ### ❓ Frequently Asked Questions
- 
- **Q: Can I cancel my booking if the weather is bad?**
- A: Yes, this tour offers free cancellation up to 24 hours before departure. Severe weather results in rescheduling or full refunds.
- 
- **Q: Do I need previous Vespa riding experience for this tour?**
- A: No prior experience is required. Guides provide thorough training and safety instruction before the tour begins.
- 
- **Q: What should I wear for this Vespa tour?**
- A: Wear comfortable clothes and closed-toe shoes. Helmets and safety equipment are provided by the tour operator.
- 
- **Q: Is this tour suitable for children?**
- A: Children ages 12 and up can participate with parental consent. Younger children cannot ride Vespas for safety reasons.
- 
- **Q: What happens if it rains during my scheduled tour?**
- A: Light rain tours continue with provided rain gear. Severe weather results in rescheduling options or full refunds.
  `,
  
    instructions: `
@@ -87,7 +70,7 @@ export const postTemplate = {
  
  YOUR MISSION: Write exceptional, in-depth content that competitors cannot easily replicate. This is A+ premium content with SMART LENGTH CONTROL.
  
- FIXED STRUCTURE (13 sections in order):
+ FIXED STRUCTURE (12 sections in order):
  1. 🎯 What Makes This Tour Special
  2. 📍 The Experience: What to Expect
  3. 🌟 Highlights & Hidden Gems
@@ -100,7 +83,6 @@ export const postTemplate = {
  10. ⭐ Review Snapshot
  11. 🔚 Final Word
  12. 👉 Recommended for
- 13. ❓ Frequently Asked Questions
  
  CONTENT QUALITY GUIDELINES WITH LENGTH LIMITS:
  
@@ -189,52 +171,6 @@ export const postTemplate = {
  - Each bullet: 1 concise sentence
  - NO emojis in text
  
- ### ❓ Frequently Asked Questions
- CRITICAL: EACH QUESTION IS INDEPENDENT - NEEDS ITS OWN ASTERISKS
- 
- Write EXACTLY 5 questions. Each question needs its own ** opening and closing **.
- 
- CORRECT FORMAT - ALL 5 QUESTIONS SHOWN:
- 
- **Q: How physically demanding is this 3-hour Vespa tour?**
- A: The tour requires moderate stamina with extended riding periods. Most participants with normal fitness complete it comfortably.
- 
- **Q: Can I cancel my $89 booking if weather is poor?**
- A: Yes, free cancellation up to 24 hours before departure. Severe weather results in rescheduling or full refunds.
- 
- **Q: What should I wear for this coastal Vespa experience?**
- A: Wear comfortable clothes and closed-toe shoes. Helmets and safety gear are provided.
- 
- **Q: What's the best time to book this sunset tour?**
- A: Late afternoon slots offer the most dramatic lighting for photos. Book the last departure time for golden hour.
- 
- **Q: Is this tour suitable for children under 12?**
- A: Children 12+ can participate with parental consent. Younger children cannot ride for safety reasons.
- 
- RULES:
- - Each Q line: **Q: question?** (4 asterisks per question)
- - A on NEW LINE after closing **
- - NO asterisks on A lines
- - Blank line between pairs
- - Use THIS tour's exact price, duration, etc.
- 
- WRONG - DO NOT GROUP ALL QUESTIONS IN ONE **:
- **Q: First question?
- A: Answer
- Q: Second question?
- A: Answer
- Q: Third question?**
- 
- RIGHT - EACH QUESTION SEPARATE:
- **Q: First question?**
- A: Answer
- 
- **Q: Second question?**
- A: Answer
- 
- TOPICS: cancellation/price, difficulty, what to wear, best time, age suitability
- NO emojis
- 
  FORMATTING RULES:
  
  1. Title: ## 🛵 [Exact Tour Name]
@@ -251,7 +187,7 @@ export const postTemplate = {
  
  3. Brief Description: 2-3 sentences after Quick Info
  
- 4. Sections: Use ### for all 13 sections
+ 4. Sections: Use ### for all 12 sections
  
  5. Paragraphs: 
     - Follow LENGTH LIMITS strictly for each section
@@ -261,16 +197,9 @@ export const postTemplate = {
  
  6. Lists: Use "- " format (dash + space), NEVER "*"
  
- 7. FAQ Format (CRITICAL - FOLLOW EXAMPLES ABOVE):
-    Two asterisks, Q:, question, two asterisks
-    New line
-    A:, answer
-    Blank line
-    Repeat
- 
- 8. Emoji Usage:
+ 7. Emoji Usage:
     ✅ USE in: Quick Info, Includes/Not Included, By the Numbers, Curator's Tip, Good to Know
-    ❌ NO emojis in: What Makes Special, Experience, Highlights, Why We Love, Reviews, Final Word, Recommended for, FAQs
+    ❌ NO emojis in: What Makes Special, Experience, Highlights, Why We Love, Reviews, Final Word, Recommended for
  
  WRITING QUALITY STANDARDS:
  
@@ -308,12 +237,8 @@ export const postTemplate = {
  - Features: ${JSON.stringify(tourData.features)}
  - Review Quotes: ${tourData.reviewQuotes?.join(' | ') || 'N/A'}
  
- Generate premium A+ content following the 13-section structure with STRICT LENGTH LIMITS.
- 
- CRITICAL REQUIREMENTS - VERIFY BEFORE SUBMITTING:
- ✅ Quick Info with order: ⭐ Rating | 💰 Price | ⏱️ Duration | 👥 Group (NO bold)
- ✅ NO "From" before price - just "$XX"
- ✅ Brief description (2-3 sentences)
+ Generate premium A+ content following the 12-section structure with STRICT LENGTH LIMITS.
+
  ✅ RESPECT ALL LENGTH LIMITS PER SECTION
  ✅ What Makes Special: Max 5-6 sentences
  ✅ Experience: Max 8 sentences
@@ -323,47 +248,27 @@ export const postTemplate = {
  ✅ Final Word: Max 3-4 sentences
  ✅ Recommended for: 3 bullets
  ✅ By the Numbers: Labels in bold format like ⭐ **Rating:** 5.0/5
- ✅ FAQs: 5 questions with COMPLETE **Q: question?** format (4 asterisks total per question)
- ✅ FAQs: A: on NEW LINE after closing **
  ✅ Cultural anecdotes and global comparisons (but concise)
  ✅ Authentic reviews with specific details (1-2 sentences each)
  ✅ Lists use "- " format
  ✅ Separate paragraphs with blank lines
  
- FAQ FORMAT REMINDER (CRITICAL - EACH QUESTION IS SEPARATE):
- 
- EACH INDIVIDUAL QUESTION needs its OWN opening ** and closing **
- NOT one ** for the entire FAQ section!
- 
- CORRECT FORMAT - 5 SEPARATE QUESTIONS:
- 
- **Q: Question 1 with $${tourData.price} price?**
- A: Answer in 2-3 sentences.
- 
- **Q: Question 2 about ${tourData.duration} duration?**
- A: Answer in 2-3 sentences.
- 
- **Q: Question 3 about what to wear?**
- A: Answer in 2-3 sentences.
- 
- **Q: Question 4 about best time?**
- A: Answer in 2-3 sentences.
- 
- **Q: Question 5 about suitability?**
- A: Answer in 2-3 sentences.
- 
- WRONG - DO NOT DO THIS:
- **Q: Question 1?
- A: Answer
- Q: Question 2?
- A: Answer
- Q: Question 3?**
- 
- Each Q line needs: **Q: text?**
- Each A line needs: A: text (no asterisks)
- 
  Write as an expert curator building ScootersTour.com as the global authority. Make this content exceptional AND concise.
  
- Start now with: ## 🛵 ${tourData.title}
- `;
+Start now with: ## 🛵 ${tourData.title}
+
+---
+
+AFTER COMPLETING ALL 12 SECTIONS ABOVE, add these 4 lines at the very end:
+
+H1_TITLE: [Main page title - MAX 55 characters - ${tourData.city} + Vespa + MOST DISTINCTIVE aspect of THIS tour - make it unique and descriptive]
+
+H2_TITLE: [Body content title - can be slightly different from H1 - more narrative/editorial style - example: "Rome: A Vespa Journey Through Hidden Views"]
+
+SEO_TITLE: [SEO optimized - MAX 60 characters - include ${tourData.city}, main keyword, and rating/price if space allows]
+
+SEO_DESCRIPTION: [150-160 characters - highlight unique selling points of THIS specific tour]
+
+KEYWORDS: [5-7 keywords based on actual tour content, comma-separated]
+`;
  };

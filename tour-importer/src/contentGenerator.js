@@ -113,13 +113,13 @@ function cleanGeneratedContent(content) {
   let cleaned = content;
   
   // PASO 1: Normalizar FAQs PRIMERO (antes de eliminar otros asteriscos)
-  cleaned = normalizeFAQs(cleaned);
+  //cleaned = normalizeFAQs(cleaned);
   
   // PASO 1.5: Normalizar Quick Info
-  cleaned = normalizeQuickInfo(cleaned);
+  //cleaned = normalizeQuickInfo(cleaned);
   
   // PASO 1.6: Normalizar "By the Numbers"
-  cleaned = normalizeByTheNumbers(cleaned);
+  //cleaned = normalizeByTheNumbers(cleaned);
   
   // PASO 2: Reemplazar asteriscos de listas al inicio de línea
   cleaned = cleaned.replace(/^\* /gm, '- ');
@@ -336,7 +336,9 @@ function detectCity(tourData) {
     'naples': 'Naples',
     'miami': 'Miami',
     'buenos aires': 'Buenos Aires',
-    'new york': 'New York'
+    'new york': 'New York',
+    'garda': 'Riva del Garda',  // ← Agregá este
+    'lake garda': 'Riva del Garda'  // ← Y este
   };
   
   for (const [key, value] of Object.entries(cities)) {
@@ -345,7 +347,7 @@ function detectCity(tourData) {
     }
   }
   
-  return 'Unknown City';
+  return '';
 }
 
 /**
@@ -378,12 +380,17 @@ export async function generateTourContent(tourData) {
       highlights: tourData.highlights,
       includes: tourData.includes,
       languages: tourData.languages,
+      provider: tourData.provider, // ← NUEVO
       reviewQuotes: tourData.reviewQuotes,
       features: tourData.features,
       url: tourData.url
     };
     
     const prompt = promptBuilder(structuredData);
+    console.log('\n🔍 DEBUG DURATION:');
+    console.log(`structuredData.duration = "${structuredData.duration}"`);
+    console.log(`structuredData original:`, structuredData);
+    console.log('--- FIN DEBUG DURATION ---\n');
     
     console.log('⏳ Esperando respuesta de Claude...');
     
@@ -400,6 +407,8 @@ export async function generateTourContent(tourData) {
     });
     
     const rawContent = message.content[0].text;
+
+
     
     // 🧹 LIMPIAR CONTENIDO AUTOMÁTICAMENTE
     const content = cleanGeneratedContent(rawContent);
@@ -411,21 +420,60 @@ export async function generateTourContent(tourData) {
     const titleMatch = content.match(/##\s*🛵\s*(.+)/);
     const bodyTitle = titleMatch ? titleMatch[1].trim() : titleVariations.h2Title;
     
-    // Generar SEO fields usando h1Title (más diferente para SEO)
-    const seoTitle = generateSEOTitle(titleVariations.h1Title, city);
-    const seoDescription = generateSEODescription(tourData, city);
-    const seoKeywords = generateKeywords(tourData, city);
+    // 🆕 AGREGADO: Extraer H1 y H2 generados por Claude
+    const h1TitleMatch = content.match(/H1_?TITLE:\s*(.+)/i);
+    const h2TitleMatch = content.match(/H2_?TITLE:\s*(.+)/i);
+    const seoTitleMatch = content.match(/SEO_?TITLE:\s*(.+)/i);
+    const seoDescMatch = content.match(/SEO_?DESCRIPTION:\s*(.+)/i);
+    const keywordsMatch = content.match(/KEYWORDS:\s*(.+)/i);
+    
+    // 🆕 AGREGADO: Usar títulos de Claude o fallback
+    const finalH1 = h1TitleMatch 
+      ? h1TitleMatch[1].trim().substring(0, 60)
+      : titleVariations.h1Title; // Fallback al sistema viejo
+    
+    const finalH2 = h2TitleMatch 
+      ? h2TitleMatch[1].trim()
+      : titleVariations.h2Title; // Fallback al sistema viejo
+    
+    const seoTitle = seoTitleMatch 
+      ? seoTitleMatch[1].trim().substring(0, 60)
+      : generateSEOTitle(titleVariations.h1Title, city);
+    
+    const seoDescription = seoDescMatch 
+      ? seoDescMatch[1].trim().substring(0, 160)
+      : generateSEODescription(tourData, city);
+    
+    const seoKeywords = keywordsMatch 
+      ? keywordsMatch[1].split(',').map(k => k.trim()) 
+      : generateKeywords(tourData, city);
+    
+    // VALIDACIÓN DE LONGITUD
+    console.log(`📏 H1 Title: ${finalH1.length} chars ${finalH1.length > 60 ? '⚠️ LARGO' : '✅'}`);
+    console.log(`📏 SEO Title: ${seoTitle.length} chars ${seoTitle.length > 60 ? '⚠️ EXCEDIDO' : '✅'}`);
+    console.log(`📏 SEO Description: ${seoDescription.length} chars ${seoDescription.length > 160 ? '⚠️ EXCEDIDO' : '✅'}`);
+    
+   // 🆕 MODIFICADO: Limpiar TODOS los campos generados
+const cleanContent = content
+.replace(/H1_?TITLE:.*\n?/gi, '')
+.replace(/H2_?TITLE:.*\n?/gi, '')
+.replace(/SEO_?TITLE:.*\n?/gi, '')
+.replace(/SEO_?DESCRIPTION:.*\n?/gi, '')
+.replace(/KEYWORDS:.*\n?/gi, '')
+.trim();
+
+
     
     return {
-      title: titleVariations.h1Title, // H1 para Sanity (MÁS DIFERENTE del original)
-      bodyTitle: bodyTitle, // H2 usado en el contenido (puede ser similar)
-      originalTitle: titleVariations.originalTitle, // Título original de GYG (referencia)
+      title: finalH1, // 🆕 MODIFICADO: H1 generado por Claude
+      bodyTitle: finalH2, // 🆕 MODIFICADO: H2 generado por Claude
+      originalTitle: titleVariations.originalTitle,
       seoTitle,
       seoDescription,
       seoKeywords,
-      body: content,
+      body: cleanContent,
       city,
-      rawContent: content
+      rawContent: cleanContent
     };
     
   } catch (error) {

@@ -16,8 +16,8 @@ if (!fs.existsSync(tempDir)) {
 }
 
 // Configuración de dimensiones mínimas
-const MIN_WIDTH = 1200;
-const MIN_HEIGHT = 800;
+const MIN_WIDTH = 600;
+const MIN_HEIGHT = 600;
 
 /**
  * Descarga una imagen desde una URL
@@ -49,25 +49,67 @@ async function downloadImage(url, filepath) {
 
 /**
  * Convierte imagen a JPG optimizado y valida dimensiones
+ * ✅ MEJORADO: Manejo especial para AVIF
  */
 async function convertToJpg(inputPath, outputPath) {
   // Obtener metadata de la imagen
   const metadata = await sharp(inputPath).metadata();
   
   console.log(`      📐 Dimensiones: ${metadata.width}x${metadata.height}px`);
+  console.log(`      📄 Formato original: ${metadata.format}`);
   
   // Validar dimensiones mínimas
   if (metadata.width < MIN_WIDTH || metadata.height < MIN_HEIGHT) {
     console.warn(`      ⚠️ Imagen muy pequeña (mínimo ${MIN_WIDTH}x${MIN_HEIGHT}px)`);
   }
   
-  // Convertir a JPG de alta calidad SIN redimensionar
-  await sharp(inputPath)
-    .jpeg({
-      quality: 95,
-      mozjpeg: true // Mejor compresión
-    })
-    .toFile(outputPath);
+  // ✅ MANEJO ESPECIAL PARA AVIF - Conversión en dos pasos
+  if (metadata.format === 'avif') {
+    console.log(`      🔄 Conversión AVIF → PNG → JPG (alta calidad)`);
+    
+    // Paso 1: AVIF → PNG sin pérdida
+    const pngPath = inputPath.replace('.tmp', '-temp.png');
+    await sharp(inputPath)
+      .png({
+        compressionLevel: 0, // Sin compresión para no perder datos
+        quality: 100
+      })
+      .toFile(pngPath);
+    
+    console.log(`      ✓ Decodificado a PNG`);
+    
+    // Paso 2: PNG → JPG máxima calidad
+    await sharp(pngPath)
+      .jpeg({
+        quality: 98, // Calidad máxima
+        chromaSubsampling: '4:4:4', // Sin pérdida de información de color
+        mozjpeg: true // Mejor algoritmo de compresión
+      })
+      .toFile(outputPath);
+    
+    console.log(`      ✓ Convertido a JPG (quality: 98, 4:4:4)`);
+    
+    // Limpiar PNG temporal
+    try {
+      fs.unlinkSync(pngPath);
+    } catch (e) {
+      // Ignorar si no existe
+    }
+    
+  } else {
+    // Otros formatos (JPG, PNG, WebP) - conversión directa
+    console.log(`      🔄 Conversión directa a JPG`);
+    
+    await sharp(inputPath)
+      .jpeg({
+        quality: 95,
+        chromaSubsampling: '4:4:4',
+        mozjpeg: true
+      })
+      .toFile(outputPath);
+    
+    console.log(`      ✓ Convertido a JPG (quality: 95)`);
+  }
   
   return {
     path: outputPath,
@@ -102,7 +144,6 @@ export async function processImages(imageUrls) {
       
       // Convertir a JPG y obtener dimensiones
       const result = await convertToJpg(downloadPath, jpgPath);
-      console.log(`      ✓ Convertida a JPG (quality: 95)`);
       
       // Leer como buffer
       const buffer = fs.readFileSync(jpgPath);
