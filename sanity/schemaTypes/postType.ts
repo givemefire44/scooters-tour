@@ -41,13 +41,18 @@ export const postType = defineType({
       validation: Rule => Rule.required()
     }),
     defineField({
-      name: 'category',
-      type: 'reference',
-      title: 'Categoría/Destino',
-      description: 'Selecciona el destino principal del tour (Roma, Paris, etc.)',
-      to: [{type: 'category'}],
-      
-  }),
+      name: 'categories', // ← Cambio a plural
+      type: 'array',
+      title: 'Categorías/Destinos',
+      description: 'Selecciona todos los destinos donde aparecerá este tour (ej: Florence, Tuscany, Chianti)',
+      of: [
+        {
+          type: 'reference',
+          to: [{type: 'category'}]
+        }
+      ],
+      validation: Rule => Rule.min(1).max(5).required().error('Mínimo 1 categoría, máximo 5')
+    }),
     // ========================================
     // SECCIÓN SEO
     // ========================================
@@ -189,10 +194,12 @@ export const postType = defineType({
           title: 'Ubicación',
           description: 'Ciudad/lugar principal del tour'
         }),
+        // ✅ CAMBIO 1: provider → platform
         defineField({
-          name: 'provider',
+          name: 'platform',
           type: 'string',
-          title: 'Proveedor del Tour',
+          title: 'Platform',
+          description: 'Curator platform (ScootersTour.com)',
           initialValue: 'scooterstour.com'
         })
       ],
@@ -304,6 +311,14 @@ export const postType = defineType({
           description: 'Total number of reviews on GetYourGuide (e.g., 1335)',
           validation: Rule => Rule.min(0).integer(),
           placeholder: '1335'
+        }),
+        // ✅ CAMBIO 2: NUEVO CAMPO provider
+        defineField({
+          name: 'provider',
+          type: 'string',
+          title: 'Tour Provider/Operator 🏢',
+          description: 'Physical tour operator from GetYourGuide (e.g., "Vesparella", "Rome by Vespa")',
+          placeholder: 'Vesparella'
         }),
         defineField({
           name: 'lastUpdated',

@@ -149,18 +149,19 @@ export default function RelatedTours({ tours }: RelatedToursProps) {
             
             return (
               <div key={tour._id} className="tour-item">
-                <Link href={`/tour/${tour.slug.current}`} className="tour-link">
+                <Link href={`/${tour.slug.current}`} className="tour-link">
                   
                   {/* IMAGEN - 🚀 ULTRA OPTIMIZADA */}
                   <div className="tour-image">
                     {image ? (
                       <Image
                         src={urlFor(image)
-                          .width(500)
-                          .height(250)
+                          .width(1000)
+                          .height(500)
                           .format('webp')
-                          .quality(90) // Mayor calidad para imágenes más pequeñas
+                          .quality(92) // Mayor calidad para imágenes más pequeñas
                           .fit('crop')
+                          .crop('entropy')  // ← NUEVO: crop inteligente (enfoca lo importante)
                           .url()}
                         alt={image.alt || tour.title}
                         fill

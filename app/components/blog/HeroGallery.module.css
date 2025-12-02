@@ -2,7 +2,8 @@
   display: grid;
   grid-template-columns: 3fr 2fr !important;  /* ✅ 66% - 33% */
   gap: 12px !important;
-  height: 350px;
+  height: 420px;
+  max-height: 45vh; /* ← NUEVA - Límite responsivo */
   margin-bottom: 40px;
   border-radius: 12px;
   overflow: hidden;

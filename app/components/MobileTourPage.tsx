@@ -339,6 +339,17 @@ export default function MobileTourPage({ post, recommendedTours }: MobileTourPag
   </div>
 )}
 
+{/* 🏢 PROVIDER - AGREGADO */}
+{post.getYourGuideData?.provider && (
+  <div className="detail-item">
+    <div className="detail-icon">🏢</div>
+    <div className="detail-content">
+      <div className="detail-label">Provider</div>
+      <div className="detail-value">{post.getYourGuideData.provider}</div>
+    </div>
+  </div>
+)}
+
           </div>
 
           {/* 🆕 RATING AL FINAL DE TOUR DETAILS */}

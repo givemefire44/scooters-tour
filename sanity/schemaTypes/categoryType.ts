@@ -25,6 +25,43 @@ export const categoryType = defineType({
       validation: (Rule) => Rule.required(),
     }),
     defineField({
+      name: 'region',
+      title: 'Geographic Region',
+      type: 'string',
+      description: 'Regional grouping for related tours (e.g., Tuscany, Lazio, Lombardy)',
+      options: {
+        list: [
+          { title: 'Tuscany', value: 'tuscany' },
+          { title: 'Lazio (Rome area)', value: 'lazio' },
+          { title: 'Lombardy (Milan area)', value: 'lombardy' },
+          { title: 'Veneto (Venice area)', value: 'veneto' },
+          { title: 'Campania (Naples area)', value: 'campania' },
+          { title: 'Sicily', value: 'sicily' },
+          { title: 'Emilia-Romagna (Bologna area)', value: 'emilia-romagna' },
+          { title: 'Piedmont (Turin area)', value: 'piedmont' },
+          { title: 'Liguria (Genoa area)', value: 'liguria' },
+          { title: 'Puglia (Bari, Lecce)', value: 'puglia' },
+          { title: 'Sardinia', value: 'sardinia' },
+          { title: 'Umbria (Perugia, Assisi)', value: 'umbria' },
+          { title: 'Abruzzo', value: 'abruzzo' },
+          { title: 'Calabria', value: 'calabria' },
+          // Fuera de Italia
+          { title: 'Île-de-France (Paris)', value: 'ile-de-france' },
+          { title: 'Florida (USA)', value: 'florida' },
+          { title: 'Buenos Aires Province', value: 'buenos-aires' },
+        ]
+      },
+      validation: Rule => Rule.required()
+    }),
+
+    defineField({
+      name: 'featured',
+      type: 'boolean',
+      title: 'Featured Destination',
+      description: '⭐ Show in "Popular Destinations" sidebar (max 5-6 recommended)',
+      initialValue: false,
+    }),
+    defineField({
       name: 'description',
       type: 'text',
       title: 'Description',
@@ -32,6 +69,29 @@ export const categoryType = defineType({
       rows: 3,
     }),
     
+    defineField({
+      name: 'country',
+      title: 'Country',
+      type: 'string',
+      description: 'Country for geographic diversification',
+      options: {
+        list: [
+          { title: '🇮🇹 Italy', value: 'italy' },
+          { title: '🇫🇷 France', value: 'france' },
+          { title: '🇺🇸 United States', value: 'usa' },
+          { title: '🇪🇸 Spain', value: 'spain' },
+          { title: '🇩🇪 Germany', value: 'germany' },
+          { title: '🇵🇹 Portugal', value: 'portugal' },
+          { title: '🇬🇧 United Kingdom', value: 'uk' },
+          { title: '🇦🇷 Argentina', value: 'argentina' },
+          { title: '🇧🇷 Brazil', value: 'brazil' },
+          { title: '🇲🇽 Mexico', value: 'mexico' },
+        ]
+      },
+      validation: Rule => Rule.required()
+    }),
+
+
     // ========================================
     // IMAGEN PRINCIPAL (HERO)
     // ========================================
@@ -117,11 +177,10 @@ export const categoryType = defineType({
     }),
     defineField({
       name: 'longDescription',
-      type: 'text',
+      type: 'blockContent',
       title: 'Long Description',
       description: 'Detailed description for the category page content (for SEO and users)',
-      rows: 5,
-    }),
+      }),
     defineField({
       name: 'featuredText',
       type: 'string',

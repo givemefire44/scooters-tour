@@ -12,76 +12,16 @@ export interface ProTip {
       slug: 'guide-to-booking-scooter-tours-and-rentals-safely'
     },
     {
-      icon: '🕳️',
-      text: 'Commodus Passage Emperor Secret Tunnel',
-      slug: 'commodus-passage-colosseum-secret-tunnel-2025'
+      icon: '🤔',
+      text: 'Why Should You Choose a Scooter or Vespa Tour?',
+      slug: 'why-should-you-choose-a-scooter-or-vespa-tour'
     },
     {
-      icon: '🏛️',
-      text: "View Colosseun Tours and Choose!",
-      slug: 'tours/colosseum'
-    },
-    {
-      icon: '✨',
-      text: 'Real Rome Stories',
-      slug: 'pages/real-rome-stories'
-    },
-    {
-      icon: '🦁',
-      text: "Secrets - History Miths and Realities",
-      slug: 'pages/secrets-history'
-    },
-    {
-      icon: '🧑‍🏫',
-      text: 'Roman Colosseum Faq.',
-      slug: 'colosseum-rome-faq-visitor-tips-or-colosseumroman-com'
-    },
-    {
-      icon: '😊',
-      text: 'Top Ten Tips',
-      slug: 'top-10-tips-for-visiting-the-colosseum-in-rome#water-fountains'
-    },
-    {
-      icon: '🏛️',
-      text: 'Roman Forum.',
-      slug: 'roman-forum'
-    },
-    {
-      icon: '⛰️',
-      text: 'Palatine Hill is a must see.',
-      slug: 'palatine-hill'
-    },
-    {
-      icon: '🥇',
-      text: 'Colosseum tickets Book in advance — they sell out fast!',
-      slug: 'book-your-colosseum-roman-tour-tickets-in-advance'
-    },
-    {
-      icon: '⭕',
-      text: 'Colosseum Arena Tour',
-      slug: 'colosseum-arena-tour'
-    },
-    {
-      icon: '🌑',
-      text: 'Colosseum Underground Tour — they sell out fast!',
-      slug: 'colosseum-underground-tour-ticket'
-    },
-    {
-      icon: '💎',
-      text: 'Private and exclusive Colosseum Tour!',
-      slug: 'private-colosseum-tour'
-    },
-    {
-      icon: '⏩',
-      text: 'Skip the line tours save hours of waiting time.',
-      slug: 'skip-the-colosseum-roman-tour-line'
+      icon: '🧭',
+      text: "How to Choose (and Where to Take) the Perfect Scooter or Vespa Tour?",
+      slug: 'how-to-choose-and-where-to-take-the-perfect-scooter-or-vespa-tour'
     },
    
-    {
-      icon: '☀️',
-      text: 'Early morning visits offer cooler weather and fewer crowds.',
-      slug: 'top-10-tips-for-visiting-the-colosseum-in-rome#early-morning-visits'
-    },
    
   
     

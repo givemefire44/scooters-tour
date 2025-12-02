@@ -8,6 +8,9 @@ import CategoryPageClient from './CategoryPageClient';
 import StaticPageClient from './StaticPageClient';
 import TourPageClient from '@/app/tour/[slug]/TourPageClient';
 
+// Queries
+import { getFeaturedCategories, getAllCategories } from '@/app/utils/categoryQueries';
+
 // ========================================
 // CONFIGURACIÓN
 // ========================================
@@ -30,6 +33,7 @@ async function getCategory(slug: string) {
     slug,
     description,
     longDescription,
+    editorialTitle,  
     featuredText,
     seoTitle,
     seoDescription,
@@ -65,6 +69,10 @@ async function getTour(slug: string) {
     _type,
     title,
     slug,
+"category": coalesce(
+  categories[0]->{ title, slug },
+  category->{ title, slug }
+),
     seoTitle,
     seoDescription,
     seoKeywords,
@@ -79,7 +87,7 @@ async function getTour(slug: string) {
       price,
       currency,
       location,
-      provider
+      platform
     },
     tourFeatures{
       freeCancellation,
@@ -95,6 +103,7 @@ async function getTour(slug: string) {
     getYourGuideData{
       rating,
       reviewCount,
+      provider,
       lastUpdated
     }
   }`;
@@ -170,12 +179,20 @@ async function getPage(slug: string) {
       description,
       icon
     },
-    pageSettings{
-      showRecommendedTours,
-      backgroundColor,
-      ctaText,
-      ctaUrl
-    },
+pageSettings{
+  showRecommendedTours,
+  recommendedTours[]->{
+    _id,
+    title,
+    slug,
+    heroImage{ asset->{ _id, url }, alt },
+    tourInfo{ duration, price, currency, location },
+    getYourGuideData{ rating, reviewCount }
+  },
+  backgroundColor,
+  ctaText,
+  ctaUrl
+},
     sidebarWidget{
       showWidget,
       ctaTitle,
@@ -212,7 +229,7 @@ async function getPage(slug: string) {
 
 // QUERY: POSTS POR CATEGORÍA
 async function getPostsByCategory(categorySlug: string) {
-  const query = `*[_type == "post" && category->slug.current == $categorySlug]| order(_createdAt desc)[0...200]{
+  const query = `*[_type == "post" && references(*[_type == "category" && slug.current == $categorySlug]._id)]| order(_createdAt desc)[0...200]{
     title,
     slug,
     seoDescription,
@@ -227,30 +244,52 @@ async function getPostsByCategory(categorySlug: string) {
   return await client.fetch(query, { categorySlug }, cacheConfig);
 }
 
-// QUERY: TOURS RECOMENDADOS
+// QUERY: TOURS DESTACADOS (híbrido: rating + recientes)  ← CÓDIGO NUEVO
 async function getRecommendedTours() {
-  const query = `*[_type == "post"] | order(_createdAt desc)[0...60] {
+  const query = `*[_type == "post" && defined(getYourGuideData.rating)] 
+    | order(getYourGuideData.rating desc, _createdAt desc)[0...60] {
     _id, title, slug,
     mainImage { asset-> { url }, alt },
     heroGallery[] { asset-> { url }, alt },
-    body
+    body,
+    getYourGuideData{ rating, reviewCount }
   }`;
 
-  return await client.fetch(query, {}, {
-    next: { revalidate: 1800 }
-  });
-}
+  return await client.fetch(query, {}, { next: { revalidate: 1800 } });
+}  
 
-// QUERY: TOURS RELACIONADOS
+// QUERY: TOURS RELACIONADOS - ✅ DIVERSIDAD + CALIDAD
 async function getRelatedTours(currentSlug: string) {
-  const query = `*[_type == "post" && slug.current != $currentSlug][0...3]{
+  // Primero obtenemos las categorías del tour actual
+  const currentTour = await client.fetch(
+    `*[_type == "post" && slug.current == $currentSlug][0]{
+      "categoryIds": categories[]._ref
+    }`,
+    { currentSlug },
+    cacheConfig
+  );
+
+  const categoryIds = currentTour?.categoryIds || [];
+
+  // Tours de OTRAS categorías (diversidad) + mejor rating
+  const query = `*[
+    _type == "post" 
+    && slug.current != $currentSlug 
+    && !(_id in path("drafts.**"))
+    && count((categories[]._ref)[@ in $categoryIds]) == 0
+    && defined(getYourGuideData.rating)
+  ] | order(getYourGuideData.rating desc)[0...3]{
     _id, title, slug,
     mainImage{ asset->{ url }, alt },
     heroGallery[]{ asset->{ url }, alt },
     body
   }`;
 
-  return await client.fetch(query, { currentSlug }, cacheConfig);
+  return await client.fetch(
+    query, 
+    { currentSlug, categoryIds }, 
+    cacheConfig
+  );
 }
 
 // ========================================
@@ -397,10 +436,12 @@ export default async function UnifiedPage({
 
   // 🔍 Buscar en paralelo (OPTIMIZADO)
   // Prioridad: categoría > tour > page
-  const [category, tour, page] = await Promise.all([
+  const [category, tour, page, featuredCategories, allCategories] = await Promise.all([
     getCategory(slug),
     getTour(slug),
-    getPage(slug)
+    getPage(slug),
+    getFeaturedCategories(),
+    getAllCategories()
   ]);
 
   // ========================================
@@ -408,13 +449,15 @@ export default async function UnifiedPage({
   // ========================================
   if (category) {
     const posts = await getPostsByCategory(slug);
-    const recommendedTours = await getRecommendedTours();
+    const recommendedTours = await getRecommendedTours(slug);
 
     return (
       <CategoryPageClient 
         category={category}
         posts={posts}
         recommendedTours={recommendedTours}
+        featuredCategories={featuredCategories}
+        allCategories={allCategories}
       />
     );
   }
@@ -431,6 +474,8 @@ export default async function UnifiedPage({
         post={tour}
         relatedPosts={relatedPosts}
         recommendedPosts={recommendedPosts}
+        featuredCategories={featuredCategories}
+        allCategories={allCategories}
       />
     );
   }
@@ -447,7 +492,9 @@ export default async function UnifiedPage({
       <StaticPageClient 
         page={page} 
         slug={slug} 
-        recommendedTours={recommendedTours} 
+        recommendedTours={recommendedTours}
+        featuredCategories={featuredCategories}
+        allCategories={allCategories}
       />
     );
   }

@@ -13,8 +13,8 @@ import RecommendedTours from '../../components/blog/RecommendedTours';
 import MobileTourPage from '../../components/MobileTourPage';
 import Breadcrumbs from '../../components/Breadcrumbs';
 import RatingDisplay from '../../components/RatingDisplay';
-
-
+import { generateBreadcrumbs } from '../../utils/breadcrumbGenerator';
+import DestinationNavigator from '../../components/DestinationNavigator';
 
 // Hook para detectar mobile
 function useMediaQuery(query: string) {
@@ -37,12 +37,16 @@ interface TourPageClientProps {
   post: any;
   relatedPosts: any[];
   recommendedPosts: any[];
+  featuredCategories: any[];
+  allCategories: any[];
 }
 
 export default function TourPageClient({ 
   post, 
   relatedPosts, 
-  recommendedPosts 
+  recommendedPosts,
+  featuredCategories,
+  allCategories
 }: TourPageClientProps) {
   const isMobile = useMediaQuery('(max-width: 768px)');
 
@@ -62,29 +66,43 @@ export default function TourPageClient({
           {post.title}
         </h1>
         
+        {/* ✅ CAMBIO 1: PROVIDER AL LADO DEL RATING */}
         {post.getYourGuideData?.rating && (
-          <div style={{ margin: '12px 0 16px 0' }}>
+          <div style={{ 
+            margin: '12px 0 16px 0',
+            display: 'flex',
+            alignItems: 'center',
+            flexWrap: 'wrap',
+            gap: '12px'
+          }}>
             <RatingDisplay
               rating={post.getYourGuideData.rating}
               reviewCount={post.getYourGuideData.reviewCount}
               size="medium"
               sourceUrl={post.bookingUrl || post.getYourGuideUrl}
             />
+            
+            {post.getYourGuideData?.provider && (
+              <>
+                <span style={{ color: '#dadce0', fontSize: '20px', lineHeight: '1' }}>•</span>
+                <span style={{ 
+                  color: '#5f6368', 
+                  fontSize: '14px',
+                  fontWeight: 500
+                }}>
+                  Provided by: <strong style={{ color: '#202124' }}>{post.getYourGuideData.provider}</strong>
+                </span>
+              </>
+            )}
           </div>
         )}
         
-        <Breadcrumbs items={[
-          { label: 'Home', href: '/' },
-          { 
-            label: 'Complete Colosseum Guide', 
-            href: '/complete-guide-to-visiting-the-roman-colosseum-step-by-step' 
-          },
-          { 
-            label: 'Colosseum Tours', 
-            href: '/tours/colosseum' 
-          },
-          { label: post.title, isActive: true }
-        ]} />
+        <Breadcrumbs items={generateBreadcrumbs('tour', {
+          title: post.title,
+          slug: post.slug.current,
+          categoryTitle: post.category?.title,
+          categorySlug: post.category?.slug?.current
+        })} />
       </Container>
 
       <Container>
@@ -111,121 +129,146 @@ export default function TourPageClient({
           }}>
             
             <section id="description">
-  <SanityContent post={post} />
-</section>
+              <SanityContent post={post} />
+            </section>
 
             <section id="details" style={{ marginTop: '40px', marginBottom: '40px' }}>
-              <div className="desktop-tour-details-panel">
-                <div className="desktop-details-header">
-                  <span className="desktop-details-icon">📋</span>
-                  <h3 className="desktop-details-title">Tour Details</h3>
-                </div>
-                
-                <div className="desktop-details-grid">
-                  {post.tourInfo?.duration && (
-                    <div className="desktop-detail-item">
-                      <div className="desktop-detail-icon">⏱️</div>
-                      <div className="desktop-detail-content">
-                        <div className="desktop-detail-label">Duration</div>
-                        <div className="desktop-detail-value">{post.tourInfo.duration}</div>
-                      </div>
-                    </div>
-                  )}
-
-                  {post.tourInfo?.location && (
-                    <div className="desktop-detail-item">
-                      <div className="desktop-detail-icon">📍</div>
-                      <div className="desktop-detail-content">
-                        <div className="desktop-detail-label">Location</div>
-                        <div className="desktop-detail-value">{post.tourInfo.location}</div>
-                      </div>
-                    </div>
-                  )}
-
-                  {post.tourFeatures?.freeCancellation && (
-                    <div className="desktop-detail-item">
-                      <div className="desktop-detail-icon">✅</div>
-                      <div className="desktop-detail-content">
-                        <div className="desktop-detail-label">Cancellation</div>
-                        <div className="desktop-detail-value">Free cancellation available</div>
-                      </div>
-                    </div>
-                  )}
-
-                  {post.tourFeatures?.skipTheLine && (
-                    <div className="desktop-detail-item">
-                      <div className="desktop-detail-icon">⚡</div>
-                      <div className="desktop-detail-content">
-                        <div className="desktop-detail-label">Access</div>
-                        <div className="desktop-detail-value">Skip the line entry</div>
-                      </div>
-                    </div>
-                  )}
-
-                  {post.tourFeatures?.wheelchairAccessible && (
-                    <div className="desktop-detail-item">
-                      <div className="desktop-detail-icon">♿</div>
-                      <div className="desktop-detail-content">
-                        <div className="desktop-detail-label">Accessibility</div>
-                        <div className="desktop-detail-value">Wheelchair accessible</div>
-                      </div>
-                    </div>
-                  )}
-
-                  {post.tourFeatures?.hostGuide && (
-                    <div className="desktop-detail-item">
-                      <div className="desktop-detail-icon">👨‍🏫</div>
-                      <div className="desktop-detail-content">
-                        <div className="desktop-detail-label">Guide Languages</div>
-                        <div className="desktop-detail-value">{post.tourFeatures.hostGuide}</div>
-                      </div>
-                    </div>
-                  )}
-
-                  {post.tourFeatures?.audioGuide && (
-                    <div className="desktop-detail-item">
-                      <div className="desktop-detail-icon">🎧</div>
-                      <div className="desktop-detail-content">
-                        <div className="desktop-detail-label">Audio Guide</div>
-                        <div className="desktop-detail-value">{post.tourFeatures.audioGuide}</div>
-                      </div>
-                    </div>
-                  )}
-                  
-                  {post.tourFeatures?.smallGroupAvailable && (
-                    <div className="desktop-detail-item">
-                      <div className="desktop-detail-icon">👥</div>
-                      <div className="desktop-detail-content">
-                        <div className="desktop-detail-label">Group Size</div>
-                        <div className="desktop-detail-value">Small groups available</div>
-                      </div>
-                    </div>
-                  )}
-             
-                {/* 💰 PRECIO */}
-{post.tourInfo?.price && (
-  <div className="desktop-detail-item">
-    <div className="desktop-detail-icon">💰</div>
-    <div className="desktop-detail-content">
-      <div className="desktop-detail-label">Price</div>
-      <div className="desktop-detail-value">
-        {post.tourInfo.currency === 'USD' && '$'}
-        {post.tourInfo.currency === 'EUR' && '€'}
-        {post.tourInfo.currency === 'ARS' && 'AR$'}
-        {post.tourInfo.price}
-        <span style={{ 
-          fontSize: '0.85rem', 
-          fontWeight: 'normal',
-          color: '#666',
-          marginLeft: '8px'
-        }}>
-          per person
-        </span>
-      </div>
+  <div className="desktop-tour-details-panel">
+    <div className="desktop-details-header">
+      <span className="desktop-details-icon">📋</span>
+      <h3 className="desktop-details-title">Tour Details</h3>
     </div>
+    
+    <div className="desktop-details-grid">
+      {/* ⏱️ DURATION */}
+      {post.tourInfo?.duration && (
+        <div className="desktop-detail-item">
+          <div className="desktop-detail-icon">⏱️</div>
+          <div className="desktop-detail-content">
+            <div className="desktop-detail-label">Duration</div>
+            <div className="desktop-detail-value">{post.tourInfo.duration}</div>
+          </div>
+        </div>
+      )}
+
+      {/* 📍 LOCATION - ✅ VALIDADO */}
+      {post.tourInfo?.location && 
+       post.tourInfo.location !== 'Unknown City' &&
+       post.tourInfo.location.trim().length > 3 && (
+        <div className="desktop-detail-item">
+          <div className="desktop-detail-icon">📍</div>
+          <div className="desktop-detail-content">
+            <div className="desktop-detail-label">Location</div>
+            <div className="desktop-detail-value">{post.tourInfo.location}</div>
+          </div>
+        </div>
+      )}
+
+      {/* ✅ FREE CANCELLATION */}
+      {post.tourFeatures?.freeCancellation && (
+        <div className="desktop-detail-item">
+          <div className="desktop-detail-icon">✅</div>
+          <div className="desktop-detail-content">
+            <div className="desktop-detail-label">Cancellation</div>
+            <div className="desktop-detail-value">Free cancellation available</div>
+          </div>
+        </div>
+      )}
+
+      {/* ⚡ SKIP THE LINE */}
+      {post.tourFeatures?.skipTheLine && (
+        <div className="desktop-detail-item">
+          <div className="desktop-detail-icon">⚡</div>
+          <div className="desktop-detail-content">
+            <div className="desktop-detail-label">Access</div>
+            <div className="desktop-detail-value">Skip the line entry</div>
+          </div>
+        </div>
+      )}
+
+      {/* ♿ WHEELCHAIR */}
+      {post.tourFeatures?.wheelchairAccessible && (
+        <div className="desktop-detail-item">
+          <div className="desktop-detail-icon">♿</div>
+          <div className="desktop-detail-content">
+            <div className="desktop-detail-label">Accessibility</div>
+            <div className="desktop-detail-value">Wheelchair accessible</div>
+          </div>
+        </div>
+      )}
+
+      {/* 👨‍🏫 GUIDE LANGUAGES - ✅ VALIDADO */}
+      {post.tourFeatures?.hostGuide && 
+       post.tourFeatures.hostGuide.trim().length > 2 &&
+       !['and', 'about', 'top', 'or', 'the'].includes(post.tourFeatures.hostGuide.toLowerCase().trim()) && (
+        <div className="desktop-detail-item">
+          <div className="desktop-detail-icon">👨‍🏫</div>
+          <div className="desktop-detail-content">
+            <div className="desktop-detail-label">Guide Languages</div>
+            <div className="desktop-detail-value">{post.tourFeatures.hostGuide}</div>
+          </div>
+        </div>
+      )}
+
+      {/* 🎧 AUDIO GUIDE - ✅ VALIDADO */}
+      {post.tourFeatures?.audioGuide && 
+       post.tourFeatures.audioGuide.trim().length > 2 &&
+       !['and', 'about', 'top', 'or', 'the'].includes(post.tourFeatures.audioGuide.toLowerCase().trim()) && (
+        <div className="desktop-detail-item">
+          <div className="desktop-detail-icon">🎧</div>
+          <div className="desktop-detail-content">
+            <div className="desktop-detail-label">Audio Guide</div>
+            <div className="desktop-detail-value">{post.tourFeatures.audioGuide}</div>
+          </div>
+        </div>
+      )}
+      
+      {/* 👥 SMALL GROUP */}
+      {post.tourFeatures?.smallGroupAvailable && (
+        <div className="desktop-detail-item">
+          <div className="desktop-detail-icon">👥</div>
+          <div className="desktop-detail-content">
+            <div className="desktop-detail-label">Group Size</div>
+            <div className="desktop-detail-value">Small groups available</div>
+          </div>
+        </div>
+      )}
+ 
+      {/* 💰 PRICE */}
+      {post.tourInfo?.price && (
+        <div className="desktop-detail-item">
+          <div className="desktop-detail-icon">💰</div>
+          <div className="desktop-detail-content">
+            <div className="desktop-detail-label">Price</div>
+            <div className="desktop-detail-value">
+              {post.tourInfo.currency === 'USD' && '$'}
+              {post.tourInfo.currency === 'EUR' && '€'}
+              {post.tourInfo.currency === 'ARS' && 'AR$'}
+              {post.tourInfo.price}
+              <span style={{ 
+                fontSize: '0.85rem', 
+                fontWeight: 'normal',
+                color: '#666',
+                marginLeft: '8px'
+              }}>
+                per person
+              </span>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 🏢 PROVIDER */}
+      {post.getYourGuideData?.provider && (
+        <div className="desktop-detail-item">
+          <div className="desktop-detail-icon">🏢</div>
+          <div className="desktop-detail-content">
+            <div className="desktop-detail-label">Provider</div>
+            <div className="desktop-detail-value">{post.getYourGuideData.provider}</div>
+          </div>
+        </div>
+      )}
     </div>
-)}
-  </div>
               
                 {/* 🆕 RATING AL FINAL DE DETAILS */}
                 {post.getYourGuideData?.rating && (
@@ -395,58 +438,52 @@ export default function TourPageClient({
               </div>
             </div>
 
-{/* 🆕 LINKS DE NAVEGACIÓN - ELEGANTES */}
-<div style={{ 
-  marginTop: '20px',
-  padding: '0'
-}}>
-  <a 
-    href="/"
-    style={{
-      display: 'flex',
-      alignItems: 'center',
-      gap: '10px',
-      padding: '14px 20px',
-      background: 'white',
-      border: '1px solid #e0e0e0',
-      borderRadius: '12px',
-      textDecoration: 'none',
-      color: '#333',
-      fontWeight: '600',
-      fontSize: '0.9rem',
-      marginBottom: '12px',
-      transition: 'all 0.2s ease'
-    }}
-  >
-    <span style={{ fontSize: '1.2rem' }}>🏠</span>
-    <span>Back to Home</span>
-  </a>
-  <a 
-    href="/tours/colosseum"
-    style={{
-      display: 'flex',
-      alignItems: 'center',
-      gap: '10px',
-      padding: '14px 20px',
-      background: 'white',
-      border: '1px solid #e0e0e0',
-      borderRadius: '12px',
-      textDecoration: 'none',
-      color: '#333',
-      fontWeight: '600',
-      fontSize: '0.9rem',
-      transition: 'all 0.2s ease'
-    }}
-  >
-    <span style={{ fontSize: '1.2rem' }}>🎫</span>
-    <span>All Colosseum Tours</span>
-  </a>
-</div>
+            <DestinationNavigator 
+              allDestinations={allCategories}
+            />
           </div>
         </div>
       </Container>
 
       <Footer />
+
+      {/* ✅ CAMBIO 3: SCHEMA.ORG JSON-LD */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            '@context': 'https://schema.org',
+            '@type': 'Product',
+            name: post.title,
+            description: post.seoDescription,
+            image: post.heroGallery?.[0] 
+              ? urlFor(post.heroGallery[0]).width(1200).height(630).url()
+              : undefined,
+            offers: {
+              '@type': 'Offer',
+              price: post.tourInfo?.price,
+              priceCurrency: post.tourInfo?.currency || 'USD',
+              availability: 'https://schema.org/InStock',
+              url: post.bookingUrl || post.getYourGuideUrl
+            },
+            provider: post.getYourGuideData?.provider ? {
+              '@type': 'Organization',
+              name: post.getYourGuideData.provider
+            } : undefined,
+            brand: post.tourInfo?.platform ? {
+              '@type': 'Organization',
+              name: post.tourInfo.platform
+            } : undefined,
+            aggregateRating: post.getYourGuideData?.rating ? {
+              '@type': 'AggregateRating',
+              ratingValue: post.getYourGuideData.rating,
+              reviewCount: post.getYourGuideData.reviewCount,
+              bestRating: 5,
+              worstRating: 1
+            } : undefined
+          })
+        }}
+      />
 
       <style jsx>{`
         .desktop-tour-details-panel {

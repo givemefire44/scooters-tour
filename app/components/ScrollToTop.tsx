@@ -60,17 +60,14 @@ export default function ScrollToTop() {
 
       {/* 🌿 ESTILOS VERDES - TOTALMENTE CAMBIADOS */}
       <style jsx>{`
-        .scroll-to-top-container {
-          /* 🎯 CONTROL TOTAL - CAMBIÁ LO QUE QUIERAS */
-          position: fixed;
-          bottom: 150px;        /* ⬆️⬇️ ALTURA: cambiá el número */
-         /* left: 20px;          ⬅️➡️ IZQUIERDA: cambiá el número */
-          right: 620px;         ⬅️➡️ DERECHA: descomentá esto y comentá "left"  
-          /*  left: 50%; transform: translateX(-50%);  🎯 CENTRO: descomentá estas dos líneas*/
-          z-index: 1000;
-          box-sizing: border-box;
-          will-change: transform;
-        }
+.scroll-to-top-container {
+  position: fixed;
+  bottom: 30px;
+  right: max(20px, calc((100vw - 1200px) / 2 + 20px)); /* ← No se sale en pantallas chicas */
+  z-index: 1000;
+  box-sizing: border-box;
+  will-change: transform;
+}
 
         .scroll-to-top-btn {
           /* 🌿 VERDE PARA MEJOR VISIBILIDAD */

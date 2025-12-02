@@ -181,7 +181,7 @@ export const pageType: SchemaTypeDefinition = defineType({
       hidden: ({ document }) => document?.pageType !== 'hero'
     }),
 
-    // ========================================
+// ========================================
     // CONFIGURACIONES ADICIONALES
     // ========================================
     defineField({
@@ -196,6 +196,21 @@ export const pageType: SchemaTypeDefinition = defineType({
           title: 'Show Recommended Tours',
           description: 'Display recommended tours component at the bottom',
           initialValue: false
+        },
+        // ✅ CAMPO NUEVO - ESTE ES EL QUE FALTABA
+        {
+          name: 'recommendedTours',
+          type: 'array',
+          title: 'Recommended Tours',
+          description: 'Select tours to recommend at the bottom of the page',
+          of: [
+            {
+              type: 'reference',
+              to: [{ type: 'post' }]
+            }
+          ],
+          validation: Rule => Rule.max(6).warning('Maximum 6 recommended tours'),
+          hidden: ({ parent }) => !parent?.showRecommendedTours
         },
         {
           name: 'backgroundColor',
@@ -811,7 +826,7 @@ export const pageType: SchemaTypeDefinition = defineType({
               name: 'name',
               type: 'string',
               title: 'Nombre del Lugar/Atracción',
-              placeholder: 'Colosseum, Vatican Museums, etc.'
+              placeholder: 'Vespa Scooter Tours, etc.'
             }),
             defineField({
               name: 'type',

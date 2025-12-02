@@ -59,8 +59,8 @@ function getBestImage(tour: RecommendedToursProps['tours'][0]) {
 
 export default function RecommendedTours({ 
   tours, 
-  initialCount = 6,     // 🎯 Mostrar 6 inicialmente
-  loadMoreCount = 4     // 🚀 Cargar 4 más cada vez
+  initialCount = 8,     // 🎯 Mostrar 6 inicialmente
+  loadMoreCount = 6     // 🚀 Cargar 4 más cada vez
 }: RecommendedToursProps) {
   
   // 📊 ESTADO PARA LOAD MORE
@@ -114,7 +114,7 @@ export default function RecommendedTours({
                     animationDelay: isNewlyLoaded ? `${(index - (visibleCount - loadMoreCount)) * 100}ms` : '0ms'
                   }}
                 >
-                  <Link href={`/tour/${tour.slug.current}`} className="recommended-tour-link">
+                  <Link href={`/${tour.slug.current}`} className="recommended-tour-link">
 
                     {/* IMAGEN IZQUIERDA - 🚀 OPTIMIZADA */}
                     <div className="recommended-tour-image">

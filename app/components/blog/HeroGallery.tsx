@@ -30,7 +30,7 @@ export default function HeroGallery({ post }: HeroGalleryProps) {
           // 🔥 CORREGIDO - Imagen principal en ALTA RESOLUCIÓN
           mainSrc: index === 0 
             ? urlFor(img)
-                .width(1200)
+                .width(2400)
                 
                 .format('webp')
                 .quality(95)
@@ -38,7 +38,7 @@ export default function HeroGallery({ post }: HeroGalleryProps) {
                 .auto('format')
                 .url()
             : urlFor(img)
-                .width(600)
+                .width(900)
                 
                 .format('webp')
                 .quality(90)

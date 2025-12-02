@@ -10,6 +10,8 @@ import UnifiedAutoLinker from '@/app/components/UnifiedAutoLinker'
 import Breadcrumbs from '@/app/components/Breadcrumbs'
 import SchemaOrgHead from '@/app/components/SchemaOrgHead'
 import TableOfContents from '@/app/components/TableOfContents'
+import { generateBreadcrumbs } from '@/app/utils/breadcrumbGenerator'
+import DestinationNavigator from '@/app/components/DestinationNavigator'
 
 // Interface actualizada con richSnippets y sidebarWidget
 interface SanityPage {
@@ -123,11 +125,15 @@ interface SanityPage {
 export default function StaticPageClient({ 
   page, 
   slug, 
-  recommendedTours 
+  recommendedTours,
+  featuredCategories,
+  allCategories
 }: { 
   page: SanityPage; 
   slug: string;
   recommendedTours: any[];
+  featuredCategories: any[];
+  allCategories: any[];
 }) {
 
  // 🎯 PÁGINAS DONDE NO USAR AUTOLINKER
@@ -609,11 +615,12 @@ export default function StaticPageClient({
         
         {/* BREADCRUMBS - SOLO PARA PÁGINAS HERO (SEO) */}
         {isHeroPage && (
-          <Breadcrumbs items={[
-            { label: 'Home', href: '/' },
-            { label: page.title, isActive: true }
-          ]} />
-        )}
+  <Breadcrumbs items={generateBreadcrumbs('page', {
+    title: page.title,
+    slug: page.slug.current,
+    isHeroPage: true
+  })} />
+)}
         
         {/* SUBTÍTULO/DESCRIPCIÓN */}
         {(page.seoDescription || page.seo?.metaDescription) && (
@@ -815,261 +822,155 @@ export default function StaticPageClient({
 
           </div>
           
-          {/* SIDEBAR STICKY - CON CLASE PARA OCULTAR EN MOBILE */}
-          <div className="sidebar-desktop" style={{
-            position: 'sticky',
-            top: '20px',
-            width: '300px',
-            height: 'fit-content',
-            alignSelf: 'start'
-          }}>
-            {/* WIDGET CTA - AHORA EDITABLE */}
-            <div style={{
-              width: '100%',
-              maxWidth: '300px',
-              background: 'white',
-              border: '1px solid #e0e0e0',
-              borderRadius: '12px',
-              overflow: 'hidden',
-              boxShadow: '0 4px 15px rgba(0,0,0,0.1)',
-              marginBottom: '20px'
-            }}>
-              
-              {/* CTA PRINCIPAL - AHORA EDITABLE */}
-              <div style={{ padding: '30px 20px 25px 20px' }}>
-                <h3 style={{
-                  fontSize: '1.2rem',
-                  fontWeight: 'bold',
-                  marginBottom: '10px',
-                  color: '#1a1a1a',
-                  textAlign: 'center'
-                }}>
-                  {page.pageSettings?.ctaText || 
-                   (slug.includes('contact') ? 'Ready to Explore Rome?' :
-                    slug.includes('about') ? 'Start Your Roman Adventure' :
-                    'Discover More')}
-                </h3>
-                
-                <p style={{
-                  color: '#666',
-                  marginBottom: '20px',
-                  lineHeight: '1.6',
-                  textAlign: 'center',
-                  fontSize: '0.9rem'
-                }}>
-                  {slug.includes('contact') ? 'Contact us for personalized tour recommendations.' :
-                   slug.includes('about') ? 'Discover the best tours and experiences in the Eternal City.' :
-                   'Explore our amazing tours and experiences in Rome.'}
-                </p>
-                
-                <a 
-                  href={page.pageSettings?.ctaUrl || '/tours/colosseum'}
-                  target={page.pageSettings?.ctaUrl?.startsWith('http') ? '_blank' : '_self'}
-                  rel={page.pageSettings?.ctaUrl?.startsWith('http') ? 'noopener noreferrer' : undefined}
-                  style={{
-                    display: 'block',
-                    background: '#e91e63',
-                    color: 'white',
-                    padding: '12px 20px',
-                    borderRadius: '25px',
-                    textDecoration: 'none',
-                    textAlign: 'center',
-                    fontWeight: 'bold',
-                    fontSize: '14px'
-                  }}
-                >
-                  {page.pageSettings?.ctaText || 'View Tours'}
-                </a>
-              </div>
+{/* SIDEBAR STICKY - CON CLASE PARA OCULTAR EN MOBILE */}
+<div className="sidebar-desktop" style={{
+  position: 'sticky',
+  top: '20px',
+  width: '300px',
+  height: 'fit-content',
+  alignSelf: 'start'
+}}>
+  {/* WIDGET CTA - EDITABLE DESDE SANITY */}
+  <div style={{
+    width: '100%',
+    maxWidth: '300px',
+    background: 'white',
+    border: '1px solid #e0e0e0',
+    borderRadius: '12px',
+    overflow: 'hidden',
+    boxShadow: '0 4px 15px rgba(0,0,0,0.1)',
+    marginBottom: '20px'
+  }}>
+    
+    {/* CTA PRINCIPAL - DESDE SANITY SIDEBAR WIDGET */}
+    <div style={{ padding: '30px 20px 25px 20px' }}>
+      <h3 style={{
+        fontSize: '1.2rem',
+        fontWeight: 'bold',
+        marginBottom: '10px',
+        color: '#1a1a1a',
+        textAlign: 'center'
+      }}>
+        {page.sidebarWidget?.ctaTitle || page.pageSettings?.ctaText || 'Discover More'}
+      </h3>
+      
+      <p style={{
+        color: '#666',
+        marginBottom: '20px',
+        lineHeight: '1.6',
+        textAlign: 'center',
+        fontSize: '0.9rem'
+      }}>
+        {page.sidebarWidget?.ctaDescription || 
+         (slug.includes('contact') ? 'Contact us for personalized tour recommendations.' :
+          slug.includes('about') ? 'Discover the best tours and experiences in the Eternal City.' :
+          'Explore our amazing tours and experiences in Rome.')}
+      </p>
+      
+      <a 
+        href={page.sidebarWidget?.ctaButtonUrl || page.pageSettings?.ctaUrl || '/'}
+        target={(page.sidebarWidget?.ctaButtonUrl || page.pageSettings?.ctaUrl)?.startsWith('http') ? '_blank' : '_self'}
+        rel={(page.sidebarWidget?.ctaButtonUrl || page.pageSettings?.ctaUrl)?.startsWith('http') ? 'noopener noreferrer' : undefined}
+        style={{
+          display: 'block',
+          background: '#e91e63',
+          color: 'white',
+          padding: '12px 20px',
+          borderRadius: '25px',
+          textDecoration: 'none',
+          textAlign: 'center',
+          fontWeight: 'bold',
+          fontSize: '14px'
+        }}
+      >
+        {page.sidebarWidget?.ctaButtonText || page.pageSettings?.ctaText || 'View Tours'}
+      </a>
+    </div>
 
-              {/* IMAGEN */}
-              {page.heroImage && (
-                <div style={{ padding: '0 20px 25px 20px' }}>
-                  <div style={{ 
-                    position: 'relative', 
-                    width: '100%', 
-                    height: '200px', 
-                    borderRadius: '8px', 
-                    overflow: 'hidden'
-                  }}>
-                    <Image
-                      src={urlFor(page.heroImage)
-                        .width(300)
-                        .height(200)
-                        .format('webp')
-                        .quality(85)
-                        .fit('crop')
-                        .url()}
-                      alt={page.title}
-                      fill
-                      style={{ objectFit: 'cover' }}
-                      sizes="300px"
-                      loading="lazy"
-                      placeholder="blur"
-                      blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWGRkqGx0f/EABUBAQEAAAAAAAAAAAAAAAAAAAMF/8QAGhEAAgIDAAAAAAAAAAAAAAAAAAECEgMRkf/aAAwDAQACEQMRAD8AltJagyeH0AthI5xdrLcNM91BF5pX2HaH9bcfaSXWGaRmknyJckliyjqTzSlT54b6bk+h0R//2Q=="
-                    />
-                  </div>
-                </div>
-              )}
-
-              {/* ICONOS/FEATURES */}
-              <div style={{ 
-                padding: '10px 20px 20px 20px',
-                fontSize: '12px',
-                color: '#666',
-                textAlign: 'center'
-              }}>
-                <div style={{ 
-                  display: 'flex', 
-                  alignItems: 'center', 
-                  justifyContent: 'center',
-                  marginBottom: '5px' 
-                }}>
-                  <span style={{ marginRight: '8px' }}>✅</span>
-                  <span>Instant Information</span>
-                </div>
-                <div style={{ 
-                  display: 'flex', 
-                  alignItems: 'center', 
-                  justifyContent: 'center',
-                  marginBottom: '5px' 
-                }}>
-                  <span style={{ marginRight: '8px' }}>📧</span>
-                  <span>Expert Guidance Available</span>
-                </div>
-              </div>
-
-            </div>
-
-            {/* ENLACES RÁPIDOS - EDITABLES MANUALMENTE */}
-            <div style={{
-              background: 'white',
-              padding: '20px',
-              borderRadius: '12px',
-              boxShadow: '0 4px 15px rgba(0,0,0,0.1)',
-              border: '1px solid #e0e0e0'
-            }}>
-              <h4 style={{
-                fontSize: '1rem',
-                fontWeight: '600',
-                marginBottom: '15px',
-                color: '#1a1a1a'
-              }}>
-                Quick Links
-              </h4>
-              
-              <div style={{
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '10px'
-              }}>
-                {/* LINKS DINÁMICOS DESDE SANITY */}
-                {page.sidebarWidget?.quickLinks && page.sidebarWidget.quickLinks.length > 0 ? (
-                  page.sidebarWidget.quickLinks.map((link, index) => (
-                    <a 
-                      key={index}
-                      href={link.url} 
-                      style={{
-                        color: '#8b5cf6',
-                        textDecoration: 'none',
-                        fontWeight: '500',
-                        fontSize: '0.9rem',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '8px'
-                      }}
-                    >
-                      <span>{link.icon || '🔗'}</span> {link.title}
-                    </a>
-                  ))
-                ) : (
-                  // FALLBACK LINKS si no hay configurados en Sanity
-                  <>
-                    <a href="/" style={{
-                      color: '#8b5cf6',
-                      textDecoration: 'none',
-                      fontWeight: '500',
-                      fontSize: '0.9rem',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '8px'
-                    }}>
-                      <span>🏛️</span> Homepage
-                    </a>
-                    
-                    <a href="/tours/colosseum" style={{
-                      color: '#8b5cf6',
-                      textDecoration: 'none',
-                      fontWeight: '500',
-                      fontSize: '0.9rem',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '8px'
-                    }}>
-                      <span>🏟️</span> Colosseum Tours
-                    </a>
-                    
-                    <a href="/about-us" style={{
-                      color: '#8b5cf6',
-                      textDecoration: 'none',
-                      fontWeight: '500',
-                      fontSize: '0.9rem',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '8px'
-                    }}>
-                      <span>ℹ️</span> About Us
-                    </a>
-                    
-                    <a href="/contact-us" style={{
-                      color: '#8b5cf6',
-                      textDecoration: 'none',
-                      fontWeight: '500',
-                      fontSize: '0.9rem',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '8px'
-                    }}>
-                      <span>📧</span> Contact
-                    </a>
-
-                    <a href="https://gyg.me/cSBzRnwb" target="_blank" rel="noopener noreferrer" style={{
-                      color: '#8b5cf6',
-                      textDecoration: 'none',
-                      fontWeight: '500',
-                      fontSize: '0.9rem',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '8px'
-                    }}>
-                      <span>🎫</span> Book Tours
-                    </a>
-                  </>
-                )}
-              </div>
-            </div>
-          </div>
-          
+    {/* IMAGEN */}
+    {page.heroImage && (
+      <div style={{ padding: '0 20px 25px 20px' }}>
+        <div style={{ 
+          position: 'relative', 
+          width: '100%', 
+          height: '200px', 
+          borderRadius: '8px', 
+          overflow: 'hidden'
+        }}>
+          <Image
+            src={urlFor(page.heroImage)
+              .width(300)
+              .height(200)
+              .format('webp')
+              .quality(85)
+              .fit('crop')
+              .url()}
+            alt={page.title}
+            fill
+            style={{ objectFit: 'cover' }}
+            sizes="300px"
+            loading="lazy"
+            placeholder="blur"
+            blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWGRkqGx0f/EABUBAQEAAAAAAAAAAAAAAAAAAAMF/8QAGhEAAgIDAAAAAAAAAAAAAAAAAAECEgMRkf/aAAwDAQACEQMRAD8AltJagyeH0AthI5xdrLcNM91BF5pX2HaH9bcfaSXWGaRmknyJckliyjqTzSlT54b6bk+h0R//2Q=="
+          />
         </div>
-      </Container>
+      </div>
+    )}
+
+    {/* ICONOS/FEATURES */}
+    <div style={{ 
+      padding: '10px 20px 20px 20px',
+      fontSize: '12px',
+      color: '#666',
+      textAlign: 'center'
+    }}>
+      <div style={{ 
+        display: 'flex', 
+        alignItems: 'center', 
+        justifyContent: 'center',
+        marginBottom: '5px' 
+      }}>
+        <span style={{ marginRight: '8px' }}>✅</span>
+        <span>Instant Information</span>
+      </div>
+      <div style={{ 
+        display: 'flex', 
+        alignItems: 'center', 
+        justifyContent: 'center',
+        marginBottom: '5px' 
+      }}>
+        <span style={{ marginRight: '8px' }}>📧</span>
+        <span>Expert Guidance Available</span>
+      </div>
+    </div>
+
+  </div>
+
+  {/* NAVEGACIÓN - Widget unificado */}
+  <DestinationNavigator allDestinations={allCategories} />
+
+</div>
+
+</div>
+</Container>
 
       {/* FOOTER FUERA DEL GRID - FULL WIDTH */}
       <Footer />
 
-      {/* BOTÓN FLOTANTE - SOLO EN MOBILE (estilo tour page) */}
-      <div className="mobile-floating-cta">
-        <a 
-          href={page.pageSettings?.ctaUrl || '/tours/colosseum'}
-          target={page.pageSettings?.ctaUrl?.startsWith('http') ? '_blank' : '_self'}
-          rel={page.pageSettings?.ctaUrl?.startsWith('http') ? 'noopener noreferrer' : undefined}
-          className="cta-button"
-        >
-          <span className="cta-text">
-            {page.pageSettings?.ctaText || 'View Tours'}
-          </span>
-          <span className="cta-arrow">→</span>
-        </a>
-      </div>
+{/* BOTÓN FLOTANTE - SOLO EN MOBILE (estilo tour page) */}
+<div className="mobile-floating-cta">
+  <a 
+    href={page.sidebarWidget?.ctaButtonUrl || page.pageSettings?.ctaUrl || '/'}
+    target={(page.sidebarWidget?.ctaButtonUrl || page.pageSettings?.ctaUrl)?.startsWith('http') ? '_blank' : '_self'}
+    rel={(page.sidebarWidget?.ctaButtonUrl || page.pageSettings?.ctaUrl)?.startsWith('http') ? 'noopener noreferrer' : undefined}
+    className="cta-button"
+  >
+    <span className="cta-text">
+      {page.sidebarWidget?.ctaButtonText || page.pageSettings?.ctaText || 'View Tours'}
+    </span>
+    <span className="cta-arrow">→</span>
+  </a>
+</div>
 
       {/* ESTILOS PARA LISTAS + RESPONSIVE + BACKGROUNDS + GALERÍAS */}
       <style jsx>{`

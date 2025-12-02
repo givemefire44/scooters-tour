@@ -8,6 +8,7 @@ import Footer from '@/app/components/Footer';
 import Breadcrumbs from '@/app/components/Breadcrumbs';
 import CategoryFAQ from '@/app/components/CategoryFAQ';
 import CategoryEditorialContent from '@/app/components/CategoryEditorialContent';
+import { generateBreadcrumbs } from '@/app/utils/breadcrumbGenerator';
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://scooterstour.com';
 const SITE_NAME = process.env.NEXT_PUBLIC_SITE_NAME || 'ScootersTour';
@@ -16,6 +17,8 @@ interface CategoryPageClientProps {
   category: any;
   posts: any[];
   recommendedTours: any[];
+  featuredCategories?: any[];
+  allCategories?: any[];
 }
 
 function getBestImage(post: any) {
@@ -111,11 +114,10 @@ export default function CategoryPageClient({
           {category.pageContent?.heroTitle || category.title}
         </h1>
 
-        <Breadcrumbs items={[
-          { label: 'Home', href: '/' },
-          { label: 'Scooter Tours Guide', href: '/guide' },
-          { label: `${category.title} Tours`, isActive: true }
-        ]} />
+        <Breadcrumbs items={generateBreadcrumbs('category', {
+          title: category.title,
+          slug: category.slug.current
+        })} />
 
         {(category.pageContent?.heroSubtitle || category.description) && (
           <div style={{
@@ -202,6 +204,7 @@ export default function CategoryPageClient({
               .replace(/\s*(Vespa|Scooter)\s*Tours?/gi, '')
               .trim()}
             content={category.longDescription}
+            customTitle={category.editorialTitle}  // ← AGREGAR AQUÍ
           />
         </Container>
       )}
@@ -218,11 +221,44 @@ export default function CategoryPageClient({
           </h2>
 
           {posts.length === 0 ? (
-            <div style={{ textAlign: 'center', padding: '40px' }}>
-              <p style={{ fontSize: '1.1rem', color: '#666' }}>
-                No hay tours disponibles para {category.title} aún.
-              </p>
-            </div>
+  <div style={{ 
+    textAlign: 'center', 
+    padding: '60px 20px',
+    maxWidth: '600px',
+    margin: '0 auto'
+  }}>
+    <div style={{
+      fontSize: '3rem',
+      marginBottom: '20px'
+    }}>
+      🛵
+    </div>
+    <h2 style={{
+      fontSize: '1.5rem',
+      fontWeight: '700',
+      color: '#1a1a1a',
+      marginBottom: '16px',
+      lineHeight: '1.3'
+    }}>
+      Tours Coming Soon!
+    </h2>
+    <p style={{ 
+      fontSize: '1.05rem', 
+      color: '#444',
+      lineHeight: '1.6',
+      marginBottom: '24px'
+    }}>
+      Tours for <strong style={{ color: '#1a1a1a' }}>{category.title}</strong> aren't available at the moment. 
+      We'll post them here as soon as they are.
+    </p>
+    <p style={{
+      fontSize: '1rem',
+      color: '#666',
+      fontWeight: '500'
+    }}>
+      👇 For now, check out these amazing tours below!
+    </p>
+  </div>
           ) : (
             <div style={{
               display: 'grid',
