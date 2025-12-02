@@ -231,10 +231,7 @@ export const categoryType = defineType({
           }
         }
       ],
-      options: {
-        collapsible: true,
-        collapsed: false
-      }
+
     }),
     
     // ========================================
