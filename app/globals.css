@@ -38,7 +38,7 @@ body {
   border-radius: 32px;
   box-shadow: 0 8px 32px rgba(80,0,80,0.10);
   margin: 0;
-  min-height: 500px; /* Altura del hero */
+  min-height: 450px; /* Altura del hero */
 }
 
 /* Container centrado y ancho máximo */
@@ -46,7 +46,7 @@ body {
   max-width: 1000px;
   margin: 0 auto;
   position: relative;
-  min-height: 500px; /* Igual que hero-section */
+  min-height: 450px; /* Igual que hero-section */
   display: flex;
   flex-direction: column;
   justify-content: space-between; /* Separa títulos arriba y buscador abajo */
@@ -60,7 +60,7 @@ body {
   font-weight: 700;
   letter-spacing: 1px;
   margin-left: 0px;
-  margin-top: 220px;
+  margin-top: 150px;
   text-shadow: 0 2px 10px rgba(0,0,0,0.10);
   text-align: center;;
 }
@@ -106,7 +106,7 @@ body {
     letter-spacing: 0.3px;
   }
   
-  .hero-subtitle {
+.hero-subtitle {
     font-size: 1rem;
     margin-bottom: 20px;
   }

@@ -134,11 +134,14 @@ export default function MobileTourPage({ post, recommendedTours }: MobileTourPag
         
         {/* BREADCRUMBS MOBILE MINIMALISTAS */}
         <div className="mobile-breadcrumbs">
-          <Breadcrumbs items={[
-            { label: 'Home', href: '/' },
-            { label: 'Tours', href: '/tours/colosseum' },
-            { label: 'Current', isActive: true }
-          ]} />
+        <Breadcrumbs items={[
+  { label: 'Home', href: '/' },
+  { 
+    label: 'Tours', 
+    href: post.category?.slug?.current ? `/${post.category.slug.current}` : '/'
+  },
+  { label: 'Current', isActive: true }
+]} />
         </div>
       </div>
 
