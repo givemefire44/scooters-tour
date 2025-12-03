@@ -59,7 +59,7 @@ export default function MinimalHeader() {
       const query = `
         *[_type == "page" && showInMenu == true] | order(menuOrder asc, title asc) {
           title,
-          slug: string;
+          "slug": slug.current,
           menuOrder
         }
       `;
