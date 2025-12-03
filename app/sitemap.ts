@@ -11,7 +11,7 @@ type SitemapEntry = {
 }
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = 'https://.com'
+  const baseUrl = 'https://scooterstour.com'
   
   console.log('🔍 SITEMAP EJECUTÁNDOSE - GENERANDO URLs...')
   
