@@ -167,4 +167,4 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   }
 }
 
-export const revalidate = 43200 // Desactivar cache temporalmente para debug
+export const revalidate = 432010 // Desactivar cache temporalmente para debug
