@@ -1,6 +1,7 @@
 import "./globals.css";
 import MinimalHeader from "./components/MinimalHeader";
 import CookieBanner from "./components/CookieBanner";
+import Footer from "./components/Footer"; 
 import ScrollToTop from "./components/ScrollToTop";
 import Script from 'next/script';
 import DeferredGA from './components/DeferredGA';
@@ -33,6 +34,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body suppressHydrationWarning={true}>
         <MinimalHeader />
         <main>{children}</main>
+
+        <Footer />  {/* ← AGREGAR ESTA LÍNEA */}
         
         {/* SCROLL TO TOP - GLOBAL PARA TODAS LAS PÁGINAS */}
         <ScrollToTop />
