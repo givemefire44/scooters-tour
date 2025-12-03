@@ -59,7 +59,7 @@ export default function MinimalHeader() {
       const query = `
         *[_type == "page" && showInMenu == true] | order(menuOrder asc, title asc) {
           title,
-          "slug": slug.current,
+          slug: string;
           menuOrder
         }
       `;
@@ -351,7 +351,7 @@ export default function MinimalHeader() {
                   {menuPages.map((page) => (
                     <Link 
                       key={page.slug.current}
-                      href={`/${page.slug.current}`} 
+                      href={`/${page.slug}`}
                       style={{ 
                         display: 'block', 
                         padding: '8px 16px', 
@@ -500,7 +500,7 @@ export default function MinimalHeader() {
                   {menuPages.map((page) => (
                     <Link 
                       key={page.slug.current}
-                      href={`/${page.slug.current}`} 
+                      href={`/${page.slug}`}
                       style={{ 
                         display: 'block', 
                         padding: '8px 16px', 
