@@ -7,7 +7,7 @@ import HeroHostel from "./components/HeroHostel";
 
 import TestimonialCarousel from "./components/TestimonialCarousel";
 import HostelGrid from "./components/HostelMosaic";
-
+import Footer from "./components/Footer";
 import ImpactBanner from "./components/ImpactBanner";
 import LugaresPopularesArg from "./components/LugaresPopularesArg";
 import RecommendedTours from "./components/blog/RecommendedTours";
@@ -392,7 +392,7 @@ export default async function HomePage() {
         <RecommendedTours tours={tours} />
       </Container>
 
-    
+      <Footer />
     </>
   )
 }
