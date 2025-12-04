@@ -11,6 +11,7 @@ import Footer from "./components/Footer";
 import ImpactBanner from "./components/ImpactBanner";
 import LugaresPopularesArg from "./components/LugaresPopularesArg";
 import RecommendedTours from "./components/blog/RecommendedTours";
+import PopularDestinations from "./components/PopularDestinations";
 
 // ========================================
 // 🚀 CONFIGURACIÓN EXTREMA DE PERFORMANCE
@@ -390,6 +391,10 @@ export default async function HomePage() {
 </Container>
       <Container>
         <RecommendedTours tours={tours} />
+      </Container>
+
+      <Container>
+      <PopularDestinations />
       </Container>
 
       <Footer />
