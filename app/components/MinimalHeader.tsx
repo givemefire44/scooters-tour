@@ -82,7 +82,7 @@ export default function MinimalHeader() {
           currency: tour.tourInfo?.currency || 'USD',
           rating: tour.getYourGuideData?.rating || 0,
           reviewCount: tour.getYourGuideData?.reviewCount || 0,
-          imageUrl: tour.heroGallery?.asset?.url || tour.mainImage?.asset?.url || ''
+          imageUrl: tour.heroGallery?.[0]?.asset?.url || tour.mainImage?.asset?.url || ''
         }));
         setTours(formattedTours);
       } else {
@@ -739,256 +739,6 @@ export default function MinimalHeader() {
           </div>
         </div>
       </header>
-
-      {/* BARRA DE BÚSQUEDA MOBILE */}
-      <div className="search-mobile" style={{
-        display: 'none',
-        padding: '10px 16px',
-        background: '#fff',
-        borderBottom: '1px solid #e0e0e0',
-        position: 'sticky',
-        top: '70px',
-        zIndex: 999
-      }}>
-        <div style={{ position: 'relative' }}>
-          <form onSubmit={handleSearch}>
-            <div style={{
-              display: 'flex',
-              alignItems: 'center',
-              border: '2px solid #e0e0e0',
-              borderRadius: '28px',
-              overflow: 'hidden',
-              background: '#fff'
-            }}>
-              <div style={{
-                display: 'flex',
-                alignItems: 'center',
-                flex: 1,
-                padding: '0 14px'
-              }}>
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#999" strokeWidth="2" style={{ marginRight: '8px', flexShrink: 0 }}>
-                  <circle cx="11" cy="11" r="8"></circle>
-                  <path d="M21 21l-4.35-4.35"></path>
-                </svg>
-                <input
-                  type="text"
-                  placeholder="Search tours..."
-                  value={busqueda}
-                  onChange={handleSearchInput}
-                  onKeyDown={handleKeyDown}
-                  onFocus={() => busqueda.length >= 2 && setShowResults(true)}
-                  style={{
-                    border: 'none',
-                    background: 'transparent',
-                    outline: 'none',
-                    flex: 1,
-                    fontSize: '15px',
-                    padding: '10px 0',
-                    color: '#333'
-                  }}
-                />
-                {busqueda && (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setBusqueda("");
-                      setTours([]);
-                      setShowResults(false);
-                    }}
-                    style={{
-                      background: "none",
-                      border: "none",
-                      cursor: "pointer",
-                      padding: "4px",
-                      display: "flex",
-                      alignItems: "center"
-                    }}
-                  >
-                    <svg width="16" height="16" viewBox="0 0 20 20">
-                      <line x1="5" y1="5" x2="15" y2="15" stroke="#999" strokeWidth="2"/>
-                      <line x1="15" y1="5" x2="5" y2="15" stroke="#999" strokeWidth="2"/>
-                    </svg>
-                  </button>
-                )}
-              </div>
-              <button
-                type="submit"
-                style={{
-                  background: '#8816c0',
-                  border: 'none',
-                  padding: '10px 20px',
-                  cursor: 'pointer',
-                  color: 'white',
-                  fontWeight: '600',
-                  fontSize: '14px',
-                  borderRadius: '0 26px 26px 0'
-                }}
-              >
-                Search
-              </button>
-            </div>
-          </form>
-
-          {/* DROPDOWN RESULTADOS MOBILE */}
-          {showResults && (busqueda.length >= 2 || tours.length > 0) && (
-            <div style={{
-              position: 'absolute',
-              top: '100%',
-              left: 0,
-              right: 0,
-              background: 'white',
-              border: '1px solid #e0e0e0',
-              borderRadius: '12px',
-              boxShadow: '0 8px 30px rgba(0,0,0,0.12)',
-              marginTop: '8px',
-              zIndex: 2000,
-              overflow: 'hidden',
-              maxHeight: '60vh',
-              overflowY: 'auto'
-            }}>
-              {loading && (
-                <div style={{ padding: '16px', textAlign: 'center', color: '#666' }}>
-                  🔄 Searching...
-                </div>
-              )}
-              
-              {!loading && tours.length === 0 && busqueda.length >= 2 && (
-                <div style={{ padding: '16px', textAlign: 'center', color: '#666' }}>
-                  🔍 No tours found
-                </div>
-              )}
-              
-              {!loading && tours.length > 0 && (
-                <>
-                  {/* DESTINATIONS */}
-                  <div style={{ padding: '12px 16px', borderBottom: '1px solid #f0f0f0' }}>
-                    <div style={{ fontSize: '11px', fontWeight: '600', color: '#666', marginBottom: '8px', textTransform: 'uppercase' }}>
-                      Destinations
-                    </div>
-                    <div
-                      onClick={() => goToSearch(busqueda)}
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '10px',
-                        padding: '8px 0',
-                        cursor: 'pointer'
-                      }}
-                    >
-                      <div style={{
-                        width: '36px',
-                        height: '36px',
-                        borderRadius: '50%',
-                        background: '#f0f0f0',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        fontSize: '16px'
-                      }}>
-                        📍
-                      </div>
-                      <div>
-                        <div style={{ fontSize: '14px', fontWeight: '500', color: '#333' }}>
-                          {busqueda.charAt(0).toUpperCase() + busqueda.slice(1)}
-                        </div>
-                        <div style={{ fontSize: '12px', color: '#888' }}>
-                          Destination
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* TOP TOURS */}
-                  <div style={{ padding: '12px 16px 8px' }}>
-                    <div style={{ fontSize: '11px', fontWeight: '600', color: '#666', marginBottom: '8px', textTransform: 'uppercase' }}>
-                      Top Tours
-                    </div>
-                  </div>
-                  
-                  {tours.map((tour, i) => (
-                    <div
-                      key={tour.id}
-                      onClick={() => goToTour(tour.slug)}
-                      style={{
-                        padding: '10px 16px',
-                        cursor: 'pointer',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '12px'
-                      }}
-                    >
-                      {tour.imageUrl ? (
-                        <img 
-                          src={tour.imageUrl} 
-                          alt={tour.name}
-                          style={{
-                            width: '48px',
-                            height: '48px',
-                            borderRadius: '8px',
-                            objectFit: 'cover'
-                          }}
-                        />
-                      ) : (
-                        <div style={{
-                          width: '48px',
-                          height: '48px',
-                          borderRadius: '8px',
-                          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          color: 'white',
-                          fontSize: '1.2rem'
-                        }}>
-                          🛵
-                        </div>
-                      )}
-                      <div style={{ flex: 1, minWidth: 0 }}>
-                        <div style={{ 
-                          fontSize: '14px', 
-                          fontWeight: '500', 
-                          marginBottom: '2px', 
-                          color: '#333',
-                          whiteSpace: 'nowrap',
-                          overflow: 'hidden',
-                          textOverflow: 'ellipsis'
-                        }}>
-                          {tour.name}
-                        </div>
-                        <div style={{ fontSize: '12px', color: '#666', display: 'flex', gap: '8px' }}>
-                          <span style={{ color: '#e91e63', fontWeight: '600' }}>
-                            ${tour.price}
-                          </span>
-                          {tour.duration && <span>{tour.duration}</span>}
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-
-                  {/* SEE ALL */}
-                  <div
-                    onClick={() => goToSearch(busqueda)}
-                    style={{
-                      padding: '14px 16px',
-                      cursor: 'pointer',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'space-between',
-                      borderTop: '1px solid #e0e0e0',
-                      background: '#fafafa'
-                    }}
-                  >
-                    <span style={{ fontSize: '14px', color: '#333', fontWeight: '500' }}>
-                      See all results
-                    </span>
-                    <span style={{ fontSize: '18px', color: '#8816c0' }}>→</span>
-                  </div>
-                </>
-              )}
-            </div>
-          )}
-        </div>
-      </div>
       
       <style jsx>{`
         @media (max-width: 768px) {
@@ -1001,9 +751,6 @@ export default function MinimalHeader() {
           .search-desktop {
             display: none !important;
           }
-          .search-mobile {
-            display: block !important;
-          }
         }
         
         @media (min-width: 769px) {
@@ -1015,9 +762,6 @@ export default function MinimalHeader() {
           }
           .search-desktop {
             display: block !important;
-          }
-          .search-mobile {
-            display: none !important;
           }
         }
       `}</style>

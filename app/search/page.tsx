@@ -10,41 +10,44 @@ interface SearchPageProps {
 }
 
 async function searchTours(query: string) {
-    if (!query || query.length < 2) return { tours: [], categories: [] };
-  
-    const searchPattern = `*${query}*`;
-  
-    const tours = await client.fetch(`
-      *[_type == "post" && title match $searchPattern] | order(_createdAt desc)[0...30] {
-        _id,
-        title,
-        "slug": slug.current,
-        seoDescription,
-        mainImage {
-          asset-> { _id, url },
-          alt
-        },
-        heroGallery[] {
-          asset-> { _id, url },
-          alt
-        },
-        tourInfo,
-        tourFeatures,
-        getYourGuideData
-      }
-    `, { searchPattern });
-  
-    const categories = await client.fetch(`
-      *[_type == "category" && title match $searchPattern][0...5] {
-        _id,
-        title,
-        "slug": slug.current,
-        "tourCount": count(*[_type == "post" && references(^._id)])
-      }
-    `, { searchPattern });
-  
-    return { tours, categories };
-  }
+  if (!query || query.length < 2) return { tours: [], categories: [] };
+
+  const searchPattern = `*${query}*`;
+
+  const tours = await client.fetch(`
+    *[_type == "post" && (
+      title match $searchPattern ||
+      count(categories[@->title match $searchPattern]) > 0
+    )] | order(_createdAt desc)[0...30] {
+      _id,
+      title,
+      "slug": slug.current,
+      seoDescription,
+      mainImage {
+        asset-> { _id, url },
+        alt
+      },
+      heroGallery[] {
+        asset-> { _id, url },
+        alt
+      },
+      tourInfo,
+      tourFeatures,
+      getYourGuideData
+    }
+  `, { searchPattern });
+
+  const categories = await client.fetch(`
+    *[_type == "category" && title match $searchPattern][0...5] {
+      _id,
+      title,
+      "slug": slug.current,
+      "tourCount": count(*[_type == "post" && references(^._id)])
+    }
+  `, { searchPattern });
+
+  return { tours, categories };
+}
 
 export default async function SearchPage({ searchParams }: SearchPageProps) {
   const query = searchParams.q || '';

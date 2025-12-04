@@ -10,18 +10,20 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    // Construir el patrón de búsqueda
     const searchPattern = `*${query}*`;
 
-    // Buscar tours
+    // Buscar tours - por título O por categoría
     const tours = await client.fetch(
-      `*[_type == "post" && title match $pattern] | order(_createdAt desc)[0...30] {
+      `*[_type == "post" && (
+        title match $pattern ||
+        count(categories[@->title match $pattern]) > 0
+      )] | order(_createdAt desc)[0...30] {
         _id,
         title,
         "slug": slug.current,
         seoDescription,
-        mainImage { asset-> { url }, alt },
-        heroGallery[0] { asset-> { url }, alt },
+        mainImage { asset-> { _id, url }, alt },
+        heroGallery[] { asset-> { _id, url }, alt },
         tourInfo,
         tourFeatures,
         getYourGuideData
