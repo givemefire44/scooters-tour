@@ -9,9 +9,11 @@ import Breadcrumbs from '@/app/components/Breadcrumbs';
 import CategoryFAQ from '@/app/components/CategoryFAQ';
 import CategoryEditorialContent from '@/app/components/CategoryEditorialContent';
 import { generateBreadcrumbs } from '@/app/utils/breadcrumbGenerator';
+import PopularDestinationsClient from '@/app/components/PopularDestinationsClient';
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://scooterstour.com';
 const SITE_NAME = process.env.NEXT_PUBLIC_SITE_NAME || 'ScootersTour';
+
 
 interface CategoryPageClientProps {
   category: any;
@@ -30,7 +32,9 @@ function getBestImage(post: any) {
 export default function CategoryPageClient({
   category,
   posts,
-  recommendedTours
+  recommendedTours,
+  featuredCategories,
+  allCategories
 }: CategoryPageClientProps) {
   const categoryFAQs = category.faqs || [];
 
@@ -204,7 +208,7 @@ export default function CategoryPageClient({
               .replace(/\s*(Vespa|Scooter)\s*Tours?/gi, '')
               .trim()}
             content={category.longDescription}
-            customTitle={category.editorialTitle}  // ← AGREGAR AQUÍ
+            customTitle={category.editorialTitle}
           />
         </Container>
       )}
@@ -221,44 +225,44 @@ export default function CategoryPageClient({
           </h2>
 
           {posts.length === 0 ? (
-  <div style={{ 
-    textAlign: 'center', 
-    padding: '60px 20px',
-    maxWidth: '600px',
-    margin: '0 auto'
-  }}>
-    <div style={{
-      fontSize: '3rem',
-      marginBottom: '20px'
-    }}>
-      🛵
-    </div>
-    <h2 style={{
-      fontSize: '1.5rem',
-      fontWeight: '700',
-      color: '#1a1a1a',
-      marginBottom: '16px',
-      lineHeight: '1.3'
-    }}>
-      Tours Coming Soon!
-    </h2>
-    <p style={{ 
-      fontSize: '1.05rem', 
-      color: '#444',
-      lineHeight: '1.6',
-      marginBottom: '24px'
-    }}>
-      Tours for <strong style={{ color: '#1a1a1a' }}>{category.title}</strong> aren't available at the moment. 
-      We'll post them here as soon as they are.
-    </p>
-    <p style={{
-      fontSize: '1rem',
-      color: '#666',
-      fontWeight: '500'
-    }}>
-      👇 For now, check out these amazing tours below!
-    </p>
-  </div>
+            <div style={{ 
+              textAlign: 'center', 
+              padding: '60px 20px',
+              maxWidth: '600px',
+              margin: '0 auto'
+            }}>
+              <div style={{
+                fontSize: '3rem',
+                marginBottom: '20px'
+              }}>
+                🛵
+              </div>
+              <h2 style={{
+                fontSize: '1.5rem',
+                fontWeight: '700',
+                color: '#1a1a1a',
+                marginBottom: '16px',
+                lineHeight: '1.3'
+              }}>
+                Tours Coming Soon!
+              </h2>
+              <p style={{ 
+                fontSize: '1.05rem', 
+                color: '#444',
+                lineHeight: '1.6',
+                marginBottom: '24px'
+              }}>
+                Tours for <strong style={{ color: '#1a1a1a' }}>{category.title}</strong> aren't available at the moment. 
+                We'll post them here as soon as they are.
+              </p>
+              <p style={{
+                fontSize: '1rem',
+                color: '#666',
+                fontWeight: '500'
+              }}>
+                👇 For now, check out these amazing tours below!
+              </p>
+            </div>
           ) : (
             <div style={{
               display: 'grid',
@@ -456,6 +460,10 @@ export default function CategoryPageClient({
 
       <Container>
         <RecommendedTours tours={recommendedTours} />
+      </Container>
+
+      <Container>
+        <PopularDestinationsClient destinations={allCategories} />
       </Container>
 
       <CategoryFAQ faqs={categoryFAQs} />

@@ -1,7 +1,6 @@
 "use client";
 
-import React, { useState, useRef, useEffect } from "react";
-import Image from "next/image"; // 🆕 AGREGADO
+import React, { useState, useRef } from "react";
 
 interface Tour {
   id: string;
@@ -14,38 +13,41 @@ interface Tour {
   rating: number;
   reviewCount: number;
   imageUrl: string;
-  viator_url: string;
-  flags: string[];
 }
 
 export default function CitySearch() {
   const [busqueda, setBusqueda] = useState("");
   const [show, setShow] = useState(false);
   const [hovered, setHovered] = useState<number | null>(null);
-  const [selectedTour, setSelectedTour] = useState<Tour | null>(null);
   const [tours, setTours] = useState<Tour[]>([]);
   const [loading, setLoading] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Buscar tours en Viator API
   const searchTours = async (query: string) => {
-    if (query.length < 3) {
+    if (query.length < 2) {
       setTours([]);
       return;
     }
 
     setLoading(true);
     try {
-      const response = await fetch('/api/viator', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ searchQuery: query })
-      });
-
+      const response = await fetch(`/api/search?q=${encodeURIComponent(query)}`);
       const data = await response.json();
       
-      if (data.success) {
-        setTours(data.results.slice(0, 8)); // Máximo 8 resultados en dropdown
+      if (data.tours && data.tours.length > 0) {
+        const formattedTours = data.tours.slice(0, 5).map((tour: any) => ({
+          id: tour._id,
+          name: tour.title,
+          slug: tour.slug,
+          description: tour.seoDescription || '',
+          duration: tour.tourInfo?.duration || '',
+          price: tour.tourInfo?.price || 0,
+          currency: tour.tourInfo?.currency || 'USD',
+          rating: tour.getYourGuideData?.rating || 0,
+          reviewCount: tour.getYourGuideData?.reviewCount || 0,
+          imageUrl: tour.heroGallery?.[0]?.asset?.url || tour.mainImage?.asset?.url || ''
+        }));
+        setTours(formattedTours);
       } else {
         setTours([]);
       }
@@ -63,45 +65,48 @@ export default function CitySearch() {
     setShow(true);
     setHovered(null);
     
-    // Debounce search
     const timeoutId = setTimeout(() => {
       searchTours(value);
-    }, 300);
+    }, 200);
 
     return () => clearTimeout(timeoutId);
   };
 
-  const handleSelect = (tour: Tour) => {
-    setBusqueda(tour.name);
-    setShow(false);
-    setHovered(null);
-    setSelectedTour(tour);
-    inputRef.current?.blur();
+  const goToTour = (slug: string) => {
+    window.location.href = `/${slug}`;
+  };
+
+  const goToSearch = (query: string) => {
+    window.location.href = `/search?q=${encodeURIComponent(query)}`;
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (!show || tours.length === 0) return;
+    if (e.key === "Enter") {
+      e.preventDefault();
+      if (hovered !== null && tours[hovered]) {
+        goToTour(tours[hovered].slug);
+        return;
+      }
+      if (busqueda.trim()) {
+        goToSearch(busqueda);
+      }
+      return;
+    }
+    if (!tours.length) return;
     if (e.key === "ArrowDown")
       setHovered(h => h === null ? 0 : Math.min(tours.length - 1, h! + 1));
     if (e.key === "ArrowUp")
       setHovered(h => h === null ? tours.length - 1 : Math.max(0, h! - 1));
-    if (e.key === "Enter" && hovered !== null) {
-      handleSelect(tours[hovered]);
-    }
     if (e.key === "Escape") {
       setShow(false);
       setHovered(null);
     }
   };
 
-  const handleSearch = () => {
-    if (selectedTour) {
-      // Abrir tour específico
-      window.open(selectedTour.viator_url, "_blank");
-    } else if (busqueda.trim()) {
-      // Búsqueda general en Viator
-      const searchUrl = `https://www.viator.com/s/?q=${encodeURIComponent(busqueda)}&pid=P00140156&mcid=42383&medium=search`;
-      window.open(searchUrl, "_blank");
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (busqueda.trim()) {
+      goToSearch(busqueda);
     }
   };
 
@@ -109,7 +114,7 @@ export default function CitySearch() {
     <form
       className="search-bar-wrap"
       autoComplete="off"
-      onSubmit={e => { e.preventDefault(); handleSearch(); }}
+      onSubmit={handleSearch}
     >
       <div className="search-bar vedette">
         <span className="search-icon">
@@ -121,11 +126,11 @@ export default function CitySearch() {
         <input
           ref={inputRef}
           type="text"
-          placeholder="Search tours & activities... (e.g. Colosseum, Vatican, Rome)"
+          placeholder="Search tours & activities... (e.g. Rome, Florence, Milan)"
           value={busqueda}
           onChange={handleInputChange}
-          onFocus={() => { if (busqueda && tours.length > 0) setShow(true); }}
-          onBlur={() => setTimeout(() => setShow(false), 150)}
+          onFocus={() => { if (busqueda.length >= 2) setShow(true); }}
+          onBlur={() => setTimeout(() => setShow(false), 200)}
           onKeyDown={handleKeyDown}
           className="search-input"
         />
@@ -163,8 +168,8 @@ export default function CitySearch() {
         </button>
       </div>
       
-      {/* DROPDOWN CON IMÁGENES ULTRA-OPTIMIZADAS */}
-      {show && tours.length > 0 && (
+      {/* DROPDOWN CON RESULTADOS */}
+      {show && busqueda.length >= 2 && (
         <div style={{
           position: "absolute",
           left: "15px",
@@ -174,8 +179,7 @@ export default function CitySearch() {
           border: "1px solid #e0e0e0",
           borderRadius: "15px",
           boxShadow: "0 8px 32px rgba(0,0,0,0.15)",
-          padding: "8px 0",
-          maxHeight: "335px",
+          maxHeight: "400px",
           overflowY: "auto",
           zIndex: 30,
           marginTop: "7px"
@@ -186,117 +190,172 @@ export default function CitySearch() {
               textAlign: "center",
               color: "#666"
             }}>
-              🔄 Searching tours...
+              🔄 Searching...
             </div>
           )}
           
-          {!loading && tours.map((tour, i) => {
-            const isActive = hovered === i;
-            return (
-              <div
-                key={tour.id}
-                onClick={() => handleSelect(tour)}
-                onMouseEnter={() => setHovered(i)}
-                style={{
-                  padding: "12px 16px",
-                  cursor: "pointer",
-                  backgroundColor: isActive ? "#f8f9fa" : "transparent",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "12px",
-                  borderBottom: i < tours.length - 1 ? "1px solid #f0f0f0" : "none",
-                  margin: "0 9px"
-                }}
-              >
-                {/* 🚀 IMAGEN CON FALLBACK PARA DOMINIOS EXTERNOS */}
-                {tour.imageUrl && (
+          {!loading && tours.length === 0 && (
+            <div style={{
+              padding: "16px",
+              textAlign: "center",
+              color: "#666"
+            }}>
+              🔍 No tours found
+            </div>
+          )}
+          
+          {!loading && tours.length > 0 && (
+            <>
+              {/* DESTINATIONS */}
+              <div style={{ padding: '12px 16px', borderBottom: '1px solid #f0f0f0' }}>
+                <div style={{ fontSize: '11px', fontWeight: '600', color: '#666', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                  Destinations
+                </div>
+                <div
+                  onClick={() => goToSearch(busqueda)}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '10px',
+                    padding: '8px 4px',
+                    cursor: 'pointer',
+                    borderRadius: '8px',
+                    transition: 'background 0.15s'
+                  }}
+                  onMouseOver={(e) => e.currentTarget.style.background = '#f5f5f5'}
+                  onMouseOut={(e) => e.currentTarget.style.background = 'transparent'}
+                >
                   <div style={{
-                    position: "relative",
-                    width: "50px",
-                    height: "50px",
-                    borderRadius: "8px",
-                    overflow: "hidden",
-                    flexShrink: 0,
-                    backgroundColor: "#f0f0f0" // Fallback mientras carga
+                    width: '36px',
+                    height: '36px',
+                    borderRadius: '50%',
+                    background: '#f0f0f0',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: '16px'
                   }}>
-                    {/* Usar img normal para URLs de Viator/TripAdvisor */}
-                    <img
-                      src={tour.imageUrl}
-                      alt={tour.name}
-                      style={{ 
-                        width: '100%',
-                        height: '100%',
-                        objectFit: 'cover',
-                        transition: 'opacity 0.2s ease'
-                      }}
-                      loading="lazy"
-                      onError={(e) => {
-                        // Fallback a placeholder si falla la imagen
-                        const target = e.target as HTMLImageElement;
-                        target.style.display = 'none';
-                        const parent = target.parentElement;
-                        if (parent) {
-                          parent.style.backgroundColor = '#e0e0e0';
-                          parent.style.display = 'flex';
-                          parent.style.alignItems = 'center';
-                          parent.style.justifyContent = 'center';
-                          parent.innerHTML = '<span style="font-size: 20px;">🎫</span>';
-                        }
-                      }}
-                    />
+                    📍
                   </div>
-                )}
-                
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{
-                    fontSize: "14px",
-                    fontWeight: 500,
-                    color: "#333",
-                    marginBottom: "4px",
-                    lineHeight: 1.3
-                  }}>
-                    {tour.name}
+                  <div>
+                    <div style={{ fontSize: '14px', fontWeight: '500', color: '#333' }}>
+                      {busqueda.charAt(0).toUpperCase() + busqueda.slice(1)}
+                    </div>
+                    <div style={{ fontSize: '12px', color: '#888' }}>
+                      Destination
+                    </div>
                   </div>
-                  <div style={{
-                    fontSize: "12px",
-                    color: "#666",
-                    display: "flex",
-                    gap: "8px",
-                    flexWrap: "wrap"
-                  }}>
-                    <span style={{ color: "#e91e63", fontWeight: 600 }}>
-                      ${tour.price} {tour.currency}
-                    </span>
-                    <span>{tour.duration}</span>
-                    {tour.rating > 0 && (
-                      <span>⭐ {tour.rating.toFixed(1)} ({tour.reviewCount})</span>
+                </div>
+              </div>
+
+              {/* TOP TOURS */}
+              <div style={{ padding: '12px 16px 8px' }}>
+                <div style={{ fontSize: '11px', fontWeight: '600', color: '#666', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                  Top Tours
+                </div>
+              </div>
+              
+              {tours.map((tour, i) => {
+                const isActive = hovered === i;
+                return (
+                  <div
+                    key={tour.id}
+                    onClick={() => goToTour(tour.slug)}
+                    onMouseEnter={() => setHovered(i)}
+                    onMouseLeave={() => setHovered(null)}
+                    style={{
+                      padding: '10px 16px',
+                      cursor: 'pointer',
+                      backgroundColor: isActive ? '#f8f9fa' : 'transparent',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '12px',
+                      transition: 'background 0.15s'
+                    }}
+                  >
+                    {tour.imageUrl ? (
+                      <img 
+                        src={tour.imageUrl} 
+                        alt={tour.name}
+                        style={{
+                          width: '50px',
+                          height: '50px',
+                          borderRadius: '8px',
+                          objectFit: 'cover'
+                        }}
+                      />
+                    ) : (
+                      <div style={{
+                        width: '50px',
+                        height: '50px',
+                        borderRadius: '8px',
+                        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        color: 'white',
+                        fontSize: '1.2rem'
+                      }}>
+                        🛵
+                      </div>
+                    )}
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ 
+                        fontSize: '14px', 
+                        fontWeight: '500', 
+                        marginBottom: '4px', 
+                        color: '#333',
+                        lineHeight: 1.3
+                      }}>
+                        {tour.name}
+                      </div>
+                      <div style={{ fontSize: '12px', color: '#666', display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                        {tour.price > 0 && (
+                          <span style={{ color: '#e91e63', fontWeight: '600' }}>
+                            ${tour.price}
+                          </span>
+                        )}
+                        {tour.duration && <span>{tour.duration}</span>}
+                        {tour.rating > 0 && (
+                          <span>⭐ {tour.rating.toFixed(1)} ({tour.reviewCount})</span>
+                        )}
+                      </div>
+                    </div>
+                    {isActive && (
+                      <div style={{ marginLeft: '8px' }}>
+                        <svg width={20} height={20} viewBox="0 0 20 20" fill="none">
+                          <circle cx="10" cy="10" r="8" stroke="#8f2fbf" strokeWidth="2"/>
+                          <path d="M7 10.5L9.5 13 13 8.5" stroke="#8f2fbf" strokeWidth="2" strokeLinecap="round"/>
+                        </svg>
+                      </div>
                     )}
                   </div>
-                  {tour.flags.includes('FREE_CANCELLATION') && (
-                    <div style={{
-                      fontSize: "11px",
-                      color: "#28a745",
-                      marginTop: "2px"
-                    }}>
-                      ✅ Free cancellation
-                    </div>
-                  )}
-                </div>
-                
-                {isActive && (
-                  <div style={{
-                    marginLeft: "8px",
-                    display: "flex"
-                  }}>
-                    <svg width={20} height={20} viewBox="0 0 20 20" fill="none">
-                      <circle cx="10" cy="10" r="8" stroke="#8f2fbf" strokeWidth="2"/>
-                      <path d="M7 10.5L9.5 13 13 8.5" stroke="#8f2fbf" strokeWidth="2" strokeLinecap="round"/>
-                    </svg>
-                  </div>
-                )}
+                );
+              })}
+
+              {/* SEE ALL RESULTS */}
+              <div
+                onClick={() => goToSearch(busqueda)}
+                style={{
+                  padding: '14px 16px',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  borderTop: '1px solid #e0e0e0',
+                  background: '#fafafa',
+                  transition: 'background 0.15s'
+                }}
+                onMouseOver={(e) => e.currentTarget.style.background = '#f0f0f0'}
+                onMouseOut={(e) => e.currentTarget.style.background = '#fafafa'}
+              >
+                <span style={{ fontSize: '14px', color: '#333', fontWeight: '500' }}>
+                  See all results for "{busqueda}"
+                </span>
+                <span style={{ fontSize: '18px', color: '#8816c0' }}>→</span>
               </div>
-            );
-          })}
+            </>
+          )}
         </div>
       )}
     </form>

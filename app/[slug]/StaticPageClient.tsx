@@ -11,7 +11,7 @@ import Breadcrumbs from '@/app/components/Breadcrumbs'
 import SchemaOrgHead from '@/app/components/SchemaOrgHead'
 import TableOfContents from '@/app/components/TableOfContents'
 import { generateBreadcrumbs } from '@/app/utils/breadcrumbGenerator'
-import DestinationNavigator from '@/app/components/DestinationNavigator'
+import PopularDestinationsClient from '@/app/components/PopularDestinationsClient'
 
 // Interface actualizada con richSnippets y sidebarWidget
 interface SanityPage {
@@ -819,8 +819,11 @@ export default function StaticPageClient({
                 <RecommendedTours tours={recommendedTours} />
               </section>
             )}
+    <PopularDestinationsClient destinations={allCategories} />
+       </div>
 
-          </div>
+
+ 
           
 {/* SIDEBAR STICKY - CON CLASE PARA OCULTAR EN MOBILE */}
 <div className="sidebar-desktop" style={{
@@ -946,13 +949,12 @@ export default function StaticPageClient({
 
   </div>
 
-  {/* NAVEGACIÓN - Widget unificado */}
-  <DestinationNavigator allDestinations={allCategories} />
-
 </div>
 
 </div>
+
 </Container>
+
 
       {/* FOOTER FUERA DEL GRID - FULL WIDTH */}
       <Footer />

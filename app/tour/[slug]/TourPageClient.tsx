@@ -14,7 +14,8 @@ import MobileTourPage from '../../components/MobileTourPage';
 import Breadcrumbs from '../../components/Breadcrumbs';
 import RatingDisplay from '../../components/RatingDisplay';
 import { generateBreadcrumbs } from '../../utils/breadcrumbGenerator';
-import DestinationNavigator from '../../components/DestinationNavigator';
+
+import PopularDestinationsClient from '@/app/components/PopularDestinationsClient'
 
 // Hook para detectar mobile
 function useMediaQuery(query: string) {
@@ -319,6 +320,10 @@ export default function TourPageClient({
               <RecommendedTours tours={recommendedPosts} />
             </section>
 
+            <section>
+            <PopularDestinationsClient destinations={allCategories} />
+            </section>
+
             <div id="cancellations" style={{ height: '1px', marginTop: '-120px', paddingTop: '120px' }}></div>
           </div>
           
@@ -438,10 +443,10 @@ export default function TourPageClient({
               </div>
             </div>
 
-            <DestinationNavigator 
-              allDestinations={allCategories}
-            />
+      
+
           </div>
+       
         </div>
       </Container>
 

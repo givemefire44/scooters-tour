@@ -5,6 +5,7 @@ import Footer from '@/app/components/Footer';
 import PopularDestinations from '@/app/components/PopularDestinations';
 import Link from 'next/link';
 
+
 interface SearchPageProps {
   searchParams: { q?: string };
 }
@@ -13,12 +14,15 @@ async function searchTours(query: string) {
   if (!query || query.length < 2) return { tours: [], categories: [] };
 
   const searchPattern = `*${query}*`;
+  const countrySearch = query.toLowerCase();
 
+  // Buscar tours - por título, categoría O país de la categoría
   const tours = await client.fetch(`
     *[_type == "post" && (
       title match $searchPattern ||
-      count(categories[@->title match $searchPattern]) > 0
-    )] | order(_createdAt desc)[0...30] {
+      count(categories[@->title match $searchPattern]) > 0 ||
+      count(categories[@->country == $countrySearch]) > 0
+    )] | order(getYourGuideData.rating desc) [0...100] {
       _id,
       title,
       "slug": slug.current,
@@ -33,20 +37,57 @@ async function searchTours(query: string) {
       },
       tourInfo,
       tourFeatures,
-      getYourGuideData
+      getYourGuideData,
+      "country": categories[0]->country
     }
-  `, { searchPattern });
+  `, { searchPattern, countrySearch });
 
+  // Si hay pocos resultados (menos de 5), completar con tours del mismo país
+  let finalTours = tours;
+  
+  if (tours.length > 0 && tours.length < 8) {
+    const country = tours[0]?.country;
+    
+    if (country) {
+      const existingIds = tours.map((t: any) => t._id);
+      
+      const moreTours = await client.fetch(`
+        *[_type == "post" && 
+          count(categories[@->country == $country]) > 0 &&
+          !(_id in $existingIds)
+        ] | order(getYourGuideData.rating desc)[0...$limit] {
+          _id,
+          title,
+          "slug": slug.current,
+          seoDescription,
+          mainImage { asset-> { _id, url }, alt },
+          heroGallery[] { asset-> { _id, url }, alt },
+          tourInfo,
+          tourFeatures,
+          getYourGuideData,
+          "country": categories[0]->country
+        }
+      `, { country, existingIds, limit: 8 - tours.length });
+      
+      finalTours = [...tours, ...moreTours];
+    }
+  }
+
+  // Buscar categorías - por título O país
   const categories = await client.fetch(`
-    *[_type == "category" && title match $searchPattern][0...5] {
+    *[_type == "category" && (
+      title match $searchPattern ||
+      country == $countrySearch
+    )][0...5] {
       _id,
       title,
       "slug": slug.current,
+      country,
       "tourCount": count(*[_type == "post" && references(^._id)])
     }
-  `, { searchPattern });
+  `, { searchPattern, countrySearch });
 
-  return { tours, categories };
+  return { tours: finalTours, categories };
 }
 
 export default async function SearchPage({ searchParams }: SearchPageProps) {
@@ -133,7 +174,10 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
         </div>
       </Container>
 
-      <PopularDestinations />
+      <Container>
+        <PopularDestinations />
+      </Container>
+
       <Footer />
     </>
   );

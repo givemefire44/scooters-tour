@@ -5,9 +5,9 @@ export default function Hero() {
   return (
     <section className="hero-section">
       <div className="hero-container">
-        <h1 className="hero-title"> The Best Scooters Tour!.</h1>
+        <h1 className="hero-title"> </h1>
         <h2 className="hero-subtitle">
-        Pick your Scooter and we'll show the way!
+        
         </h2>
         {/* <BubbleComments
           comments={[
